@@ -1,10 +1,10 @@
 # DDD Go Template
 
 This project was created to illustrate a great architectural structure
-I developed together with @fabiorodrigues in the period I was working
+I developed together with [@fabiorodrigues](https://github.com/fabiorodrigues) in the period I was working
 for [Dito](https://dito.com.br), they both deserve as much credit as me here.
 
-This very flat template is organized in 3 directories:
+This very powerful, but yet flat and simple, template is organized in 3 directories:
 
 - **cmd/:** Each subdirectory is an entrypoint for the project,
   e.g. a worker, an API or a CLI interface, each of these packages
