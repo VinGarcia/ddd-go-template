@@ -51,6 +51,10 @@ func main() {
 	// since it is allowed to know and reference everything, it is then, also ok for it to
 	// have direct external dependencies such as the fasthttp framework and router:
 	router := routing.New()
+	router.Get("/ping", func(ctx *routing.Context) error {
+		ctx.SetBody([]byte("pong"))
+		return nil
+	})
 	router.Get("/venues/<latitude>,<longitude>", adapter.Adapt(venuesController.GetVenuesByCoordinates))
 	router.Get("/venues/details/<id>", adapter.Adapt(venuesController.GetDetails))
 
