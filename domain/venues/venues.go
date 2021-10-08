@@ -6,12 +6,11 @@ import (
 	"fmt"
 
 	"github.com/vingarcia/my-ddd-go-layout/domain"
-	"github.com/vingarcia/my-ddd-go-layout/infra/rest"
 )
 
 type Service struct {
 	logger domain.LogProvider
-	rest   rest.Provider
+	rest   domain.RestProvider
 	cache  domain.CacheProvider
 
 	baseURL  string
@@ -21,7 +20,7 @@ type Service struct {
 
 func New(
 	logger domain.LogProvider,
-	rest rest.Provider,
+	rest domain.RestProvider,
 	cache domain.CacheProvider,
 	baseURL string,
 	clientID string,
@@ -39,7 +38,7 @@ func New(
 
 func (s Service) GetVenues(ctx context.Context, latitude string, longitude string) ([]domain.Venue, error) {
 	url := fmt.Sprintf("%s/venues/search?client_id=%s&client_secret=%s&v=20210514&ll=%s,%s", s.baseURL, s.clientID, s.secret, latitude, longitude)
-	resp, err := s.rest.Get(url, rest.RequestData{})
+	resp, err := s.rest.Get(ctx, url, domain.RequestData{})
 	if err != nil {
 		s.logger.Error(ctx, "error-retrieving-venues-from-foursquare-by-coordinates", domain.LogBody{
 			"latitude":  latitude,
@@ -77,7 +76,7 @@ func (s Service) GetVenue(ctx context.Context, venueID string) ([]byte, error) {
 	}
 
 	url := fmt.Sprintf("%s/venues/%s?client_id=%s&client_secret=%s&v=20210514", s.baseURL, venueID, s.clientID, s.secret)
-	resp, err := s.rest.Get(url, rest.RequestData{})
+	resp, err := s.rest.Get(ctx, url, domain.RequestData{})
 	if err != nil {
 		s.logger.Error(ctx, "error-fetching-venue-by-latitude-from-foursquare", domain.LogBody{
 			"venue_id": venueID,

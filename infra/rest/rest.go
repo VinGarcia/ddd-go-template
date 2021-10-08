@@ -10,6 +10,8 @@ import (
 	"net/http"
 	"strings"
 	"time"
+
+	"github.com/vingarcia/my-ddd-go-layout/domain"
 )
 
 // Client contains methods for making rest requests
@@ -31,82 +33,61 @@ func New(timeout time.Duration) Client {
 
 // Get will make a GET request to the input URL
 // and return the results
-func (c Client) Get(url string, data RequestData) (Response, error) {
-	return c.makeRequest("GET", url, data)
+func (c Client) Get(ctx context.Context, url string, data domain.RequestData) (domain.Response, error) {
+	return c.makeRequest(ctx, "GET", url, data)
 }
 
 // Post will make a POST request to the input URL
 // and return the results
-func (c Client) Post(url string, data RequestData) (Response, error) {
-	return c.makeRequest("POST", url, data)
+func (c Client) Post(ctx context.Context, url string, data domain.RequestData) (domain.Response, error) {
+	return c.makeRequest(ctx, "POST", url, data)
 }
 
 // Put will make a PUT request to the input URL
 // and return the results
-func (c Client) Put(url string, data RequestData) (Response, error) {
-	return c.makeRequest("PUT", url, data)
+func (c Client) Put(ctx context.Context, url string, data domain.RequestData) (domain.Response, error) {
+	return c.makeRequest(ctx, "PUT", url, data)
 }
 
 // Patch will make a PATCH request to the input URL
 // and return the results
-func (c Client) Patch(url string, data RequestData) (Response, error) {
-	return c.makeRequest("PATCH", url, data)
+func (c Client) Patch(ctx context.Context, url string, data domain.RequestData) (domain.Response, error) {
+	return c.makeRequest(ctx, "PATCH", url, data)
 }
 
 // Delete will make a DELETE request to the input URL
 // and return the results
-func (c Client) Delete(url string, data RequestData) (Response, error) {
-	return c.makeRequest("DELETE", url, data)
+func (c Client) Delete(ctx context.Context, url string, data domain.RequestData) (domain.Response, error) {
+	return c.makeRequest(ctx, "DELETE", url, data)
 }
 
 func (c Client) makeRequest(
+	ctx context.Context,
 	method string,
 	url string,
-	data RequestData,
-) (_ Response, err error) {
-	data.SetDefaultsIfNecessary()
-
-	ctx := data.Context
-	if ctx == nil {
-		ctx = context.TODO()
-	}
-
+	data domain.RequestData,
+) (_ domain.Response, err error) {
 	var requestBody io.Reader
 	switch body := data.Body.(type) {
 	case nil:
 		requestBody = nil
 	case io.Reader:
-		if data.MaxRetries > 1 {
-			return Response{}, fmt.Errorf("can't retry a request whose body is an io.Reader!")
-		}
-
 		requestBody = body
 	case []byte:
 		requestBody = bytes.NewReader(body)
 	case string:
 		requestBody = strings.NewReader(body)
-	case MultipartData:
-		if data.MaxRetries > 1 {
-			return Response{}, fmt.Errorf("can't retry a request whose body depends on io.Reader's!")
-		}
-
-		form, contentType, err := newMultipartStream(body)
-		if err != nil {
-			return Response{}, fmt.Errorf("error building multipart data: %v", err)
-		}
-		data.Headers["Content-Type"] = contentType
-		requestBody = form
 	default:
 		inputBodyJSON, err := json.Marshal(data.Body)
 		if err != nil {
-			return Response{}, err
+			return domain.Response{}, err
 		}
 		requestBody = bytes.NewReader(inputBodyJSON)
 	}
 
 	req, err := http.NewRequestWithContext(ctx, method, url, requestBody)
 	if err != nil {
-		return Response{}, err
+		return domain.Response{}, err
 	}
 
 	for k, v := range data.Headers {
@@ -114,12 +95,9 @@ func (c Client) makeRequest(
 	}
 
 	var resp *http.Response
-	Retry(ctx, data.BaseRetryDelay, data.MaxRetryDelay, data.MaxRetries, func() bool {
-		resp, err = c.http.Do(req)
-		return data.RetryRule(resp, err)
-	})
+	resp, err = c.http.Do(req)
 	if err != nil {
-		return Response{}, err
+		return domain.Response{}, err
 	}
 
 	header := map[string]string{}
@@ -133,22 +111,16 @@ func (c Client) makeRequest(
 	isStatusSuccess := (resp.StatusCode >= 200 && resp.StatusCode < 300)
 
 	var body []byte
-	bodyReader := io.ReadCloser(resp.Body)
-	if !data.Stream || !isStatusSuccess {
-		body, err = ioutil.ReadAll(resp.Body)
-		resp.Body.Close()
-		bodyReader = io.NopCloser(bytes.NewReader(body))
-	}
-
+	body, err = ioutil.ReadAll(resp.Body)
 	if err == nil && !isStatusSuccess {
 		err = fmt.Errorf(
 			"%s %s: unexpected status code: %d, payload: %s",
 			method, url, resp.StatusCode, string(body),
 		)
 	}
+	resp.Body.Close()
 
-	return Response{
-		ReadCloser: bodyReader,
+	return domain.Response{
 		Body:       body,
 		Header:     header,
 		StatusCode: resp.StatusCode,
