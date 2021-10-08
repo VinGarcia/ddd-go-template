@@ -66,8 +66,9 @@ func (s Service) GetVenues(ctx context.Context, latitude string, longitude strin
 }
 
 func (s Service) GetVenue(ctx context.Context, venueID string) ([]byte, error) {
-	cachedVenue, ok := s.cache.Get(venueID).([]byte)
-	if ok {
+	var cachedVenue []byte
+	err := s.cache.Get(ctx, venueID, &cachedVenue)
+	if err == nil {
 		// Log IDs, not payloads whenever possible, except when errors happen, then log everything.
 		s.logger.Debug(ctx, "fetching-venue-from-cache", domain.LogBody{
 			"venue_id": venueID,
@@ -89,6 +90,6 @@ func (s Service) GetVenue(ctx context.Context, venueID string) ([]byte, error) {
 	s.logger.Debug(ctx, "adding-venue-to-cache", domain.LogBody{
 		"venue_id": venueID,
 	})
-	s.cache.Set(venueID, resp.Body)
+	err = s.cache.Set(ctx, venueID, resp.Body)
 	return resp.Body, err
 }

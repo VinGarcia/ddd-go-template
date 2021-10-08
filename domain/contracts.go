@@ -2,9 +2,23 @@ package domain
 
 import "context"
 
+// CacheProvider implements a simple type-safe cache
+//
+// Usage example:
+//
+// err := cache.Set("some_key", Foo{Name: "example object"})
+// if err != nil {
+//   return err
+// }
+//
+// var result Foo
+// err := cache.Get("some_key", &result)
+// if err != nil {
+//   return err
+// }
 type CacheProvider interface {
-	Get(key string) interface{}
-	Set(key string, value interface{})
+	Get(ctx context.Context, key string, record interface{}) error
+	Set(ctx context.Context, key string, record interface{}) error
 }
 
 type LogProvider interface {

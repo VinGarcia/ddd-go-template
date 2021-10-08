@@ -9,6 +9,7 @@ import (
 	"github.com/vingarcia/my-ddd-go-layout/infra/env"
 	"github.com/vingarcia/my-ddd-go-layout/infra/jsonlogs"
 	"github.com/vingarcia/my-ddd-go-layout/infra/memorycache"
+	"github.com/vingarcia/my-ddd-go-layout/infra/redis"
 	"github.com/vingarcia/my-ddd-go-layout/infra/rest"
 
 	routing "github.com/jackwhelpton/fasthttp-routing/v2"
@@ -26,13 +27,20 @@ func main() {
 	foursquareBaseURL := env.MustGetString("FOURSQUARE_BASE_URL")
 	foursquareClientID := env.MustGetString("FOURSQUARE_CLIENT_ID")
 	foursquareSecret := env.MustGetString("FOURSQUARE_SECRET")
+	redisURL := env.GetString("REDIS_URL", "")
+	redisPassword := env.GetString("REDIS_PASSWORD", "")
 
 	// Dependency Injection goes here:
 	logger := jsonlogs.New(logLevel)
 
 	restClient := rest.New(30 * time.Second)
 
-	cacheClient := memorycache.New(24*time.Hour, 10*time.Minute)
+	var cacheClient domain.CacheProvider
+	if redisURL != "" {
+		cacheClient = redis.New(redisURL, redisPassword, 24*time.Hour)
+	} else {
+		cacheClient = memorycache.New(24*time.Hour, 10*time.Minute)
+	}
 
 	venuesService := venues.New(
 		logger,
