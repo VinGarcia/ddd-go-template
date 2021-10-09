@@ -45,7 +45,10 @@ func (s Service) GetVenues(ctx context.Context, latitude string, longitude strin
 			"longitude": longitude,
 			"payload":   string(resp.Body),
 		})
-		return nil, fmt.Errorf("error retrieving venues from foursquare: %s", err)
+		return nil, domain.InternalErr("error-retrieving-venues-from-foursquare", map[string]interface{}{
+			"latitude":  latitude,
+			"longitude": longitude,
+		})
 	}
 
 	var respBody struct {

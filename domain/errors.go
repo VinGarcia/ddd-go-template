@@ -1,6 +1,8 @@
 package domain
 
 import (
+	"context"
+	"encoding/json"
 	"fmt"
 	"strings"
 )
@@ -22,12 +24,15 @@ func (e DomainErr) Error() string {
 	return strings.Join(fields, "; ")
 }
 
-func ErrCode(err error) string {
+func AsDomainErr(err error) DomainErr {
 	domainErr, ok := err.(DomainErr)
-	if !ok {
-		return "InternalErr"
+	if ok {
+		return domainErr
 	}
-	return domainErr.code
+	return DomainErr{
+		code:  "InternalErr",
+		title: err.Error(),
+	}
 }
 
 func InternalErr(title string, data map[string]interface{}) DomainErr {
@@ -52,4 +57,45 @@ func NotFoundErr(title string, data map[string]interface{}) DomainErr {
 		title: title,
 		data:  data,
 	}
+}
+
+func HandleDomainErrAsHTTP(ctx context.Context, logger LogProvider, err error, method string, path string) (status int, responseBody []byte) {
+	domainErr := AsDomainErr(err)
+
+	response := map[string]interface{}{
+		"code":       domainErr.code,
+		"request_id": GetRequestIDFromContext(ctx),
+	}
+
+	switch domainErr.code {
+	case "InternalErr":
+		status = 500
+
+		data := LogBody{
+			"route": method + ": " + path,
+		}
+		for k, v := range domainErr.data {
+			data[k] = v
+		}
+		logger.Error(ctx, "request-error", data)
+
+	case "BadRequest":
+		status = 400
+		for k, v := range domainErr.data {
+			if response[k] == nil {
+				response[k] = v
+			}
+		}
+
+	case "NotFoundErr":
+		status = 404
+		for k, v := range domainErr.data {
+			if response[k] == nil {
+				response[k] = v
+			}
+		}
+	}
+
+	responseBody, _ = json.Marshal(response)
+	return status, responseBody
 }

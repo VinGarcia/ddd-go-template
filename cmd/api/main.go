@@ -4,6 +4,7 @@ import (
 	"context"
 	"time"
 
+	"github.com/gofiber/fiber/v2"
 	"github.com/vingarcia/my-ddd-go-layout/domain"
 	"github.com/vingarcia/my-ddd-go-layout/domain/venues"
 	"github.com/vingarcia/my-ddd-go-layout/infra/env"
@@ -12,10 +13,7 @@ import (
 	"github.com/vingarcia/my-ddd-go-layout/infra/redis"
 	"github.com/vingarcia/my-ddd-go-layout/infra/rest"
 
-	routing "github.com/jackwhelpton/fasthttp-routing/v2"
-	"github.com/valyala/fasthttp"
-
-	adapter "github.com/vingarcia/go-adapter"
+	adapter "github.com/vingarcia/go-adapter/fiber/v2"
 )
 
 func main() {
@@ -56,20 +54,26 @@ func main() {
 	venuesController := venues.NewController(venuesService)
 
 	// Any framework you need for serving HTTP or GRPC goes in the main package,
-	// since it is allowed to know and reference everything, it is then, also ok for it to
-	// have direct external dependencies such as the fasthttp framework and router:
-	router := routing.New()
-	router.Get("/ping", func(ctx *routing.Context) error {
-		ctx.SetBody([]byte("pong"))
-		return nil
+	//
+	// It should be kept here because the main package is the only one that is allowed
+	// to depend on anything, and also because this logic is unique to this endpoint,
+	// so you won't reuse it anywhere else.
+	app := fiber.New()
+
+	app.Use(handleRequestID())
+	app.Use(handleError(logger))
+
+	app.Get("/ping", func(c *fiber.Ctx) error {
+		return c.SendString("pong")
 	})
-	router.Get("/venues/<latitude>,<longitude>", adapter.Adapt(venuesController.GetVenuesByCoordinates))
-	router.Get("/venues/details/<id>", adapter.Adapt(venuesController.GetDetails))
+	app.Get("/venues/<latitude>,<longitude>", adapter.Adapt(venuesController.GetVenuesByCoordinates))
+	app.Get("/venues/details/<id>", adapter.Adapt(venuesController.GetDetails))
 
 	logger.Info(ctx, "server-starting-up", domain.LogBody{
 		"port": port,
 	})
-	if err := fasthttp.ListenAndServe(":"+port, router.HandleRequest); err != nil {
+
+	if err := app.Listen(":" + port); err != nil {
 		logger.Error(ctx, "server-stopped-with-an-error", domain.LogBody{
 			"error": err.Error(),
 		})
