@@ -5,13 +5,13 @@ import (
 	"time"
 
 	"github.com/gofiber/fiber/v2"
-	"github.com/vingarcia/my-ddd-go-layout/domain"
-	"github.com/vingarcia/my-ddd-go-layout/domain/venues"
-	"github.com/vingarcia/my-ddd-go-layout/infra/env"
-	"github.com/vingarcia/my-ddd-go-layout/infra/jsonlogs"
-	"github.com/vingarcia/my-ddd-go-layout/infra/memorycache"
-	"github.com/vingarcia/my-ddd-go-layout/infra/redis"
-	"github.com/vingarcia/my-ddd-go-layout/infra/rest"
+	"github.com/vingarcia/ddd-go-layout/domain"
+	"github.com/vingarcia/ddd-go-layout/domain/venues"
+	"github.com/vingarcia/ddd-go-layout/infra/env"
+	"github.com/vingarcia/ddd-go-layout/infra/jsonlogs"
+	"github.com/vingarcia/ddd-go-layout/infra/memorycache"
+	"github.com/vingarcia/ddd-go-layout/infra/redis"
+	"github.com/vingarcia/ddd-go-layout/infra/rest"
 
 	adapter "github.com/vingarcia/go-adapter/fiber/v2"
 )

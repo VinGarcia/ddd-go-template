@@ -8,7 +8,7 @@ import (
 	"testing"
 	"time"
 
-	"github.com/vingarcia/my-ddd-go-layout/domain"
+	"github.com/vingarcia/ddd-go-layout/domain"
 
 	"github.com/stretchr/testify/assert"
 )

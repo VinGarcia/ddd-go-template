@@ -1,4 +1,4 @@
-module github.com/vingarcia/my-ddd-go-layout
+module github.com/vingarcia/ddd-go-layout
 
 go 1.16
 

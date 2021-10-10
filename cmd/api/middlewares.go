@@ -2,7 +2,7 @@ package main
 
 import (
 	"github.com/gofiber/fiber/v2"
-	"github.com/vingarcia/my-ddd-go-layout/domain"
+	"github.com/vingarcia/ddd-go-layout/domain"
 )
 
 func handleRequestID() func(c *fiber.Ctx) error {
