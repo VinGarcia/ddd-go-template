@@ -1,7 +1,6 @@
 package venuesctrl
 
 import (
-	"context"
 	"encoding/json"
 	"fmt"
 
@@ -32,9 +31,7 @@ func (c Controller) GetVenuesByCoordinates(ctx *fiber.Ctx, args struct {
 	Latitude  string `path:"latitude"`
 	Longitude string `path:"longitude"`
 }) error {
-	goCtx := context.Background()
-
-	venues, err := c.venuesService.GetVenues(goCtx, args.Latitude, args.Longitude)
+	venues, err := c.venuesService.GetVenues(ctx.Context(), args.Latitude, args.Longitude)
 	if err != nil {
 		return err
 	}
@@ -50,9 +47,7 @@ func (c Controller) GetVenuesByCoordinates(ctx *fiber.Ctx, args struct {
 func (c Controller) GetDetails(ctx *fiber.Ctx, args struct {
 	ID string `path:"id"`
 }) error {
-	goCtx := context.Background()
-
-	venue, err := c.venuesService.GetVenue(goCtx, args.ID)
+	venue, err := c.venuesService.GetVenue(ctx.Context(), args.ID)
 	if err != nil {
 		return err
 	}

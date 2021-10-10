@@ -64,6 +64,7 @@ func HandleDomainErrAsHTTP(ctx context.Context, logger LogProvider, err error, m
 
 	response := map[string]interface{}{
 		"code":       domainErr.code,
+		"title":      domainErr.title,
 		"request_id": GetRequestIDFromContext(ctx),
 	}
 
@@ -82,17 +83,13 @@ func HandleDomainErrAsHTTP(ctx context.Context, logger LogProvider, err error, m
 	case "BadRequest":
 		status = 400
 		for k, v := range domainErr.data {
-			if response[k] == nil {
-				response[k] = v
-			}
+			response[k] = v
 		}
 
 	case "NotFoundErr":
 		status = 404
 		for k, v := range domainErr.data {
-			if response[k] == nil {
-				response[k] = v
-			}
+			response[k] = v
 		}
 	}
 

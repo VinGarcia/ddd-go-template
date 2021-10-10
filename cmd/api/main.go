@@ -6,16 +6,22 @@ import (
 
 	"github.com/gofiber/fiber/v2"
 	"github.com/vingarcia/ddd-go-layout/cmd/api/middlewares"
+	"github.com/vingarcia/ddd-go-layout/cmd/api/usersctrl"
 	"github.com/vingarcia/ddd-go-layout/cmd/api/venuesctrl"
 	"github.com/vingarcia/ddd-go-layout/domain"
+	"github.com/vingarcia/ddd-go-layout/domain/users"
 	"github.com/vingarcia/ddd-go-layout/domain/venues"
 	"github.com/vingarcia/ddd-go-layout/infra/env"
 	"github.com/vingarcia/ddd-go-layout/infra/jsonlogs"
 	"github.com/vingarcia/ddd-go-layout/infra/memorycache"
 	"github.com/vingarcia/ddd-go-layout/infra/redis"
 	"github.com/vingarcia/ddd-go-layout/infra/rest"
+	"github.com/vingarcia/ddd-go-layout/infra/usersrepo"
+	"github.com/vingarcia/ksql"
 
 	adapter "github.com/vingarcia/go-adapter/fiber/v2"
+
+	_ "github.com/lib/pq"
 )
 
 func main() {
@@ -29,6 +35,7 @@ func main() {
 	foursquareSecret := env.MustGetString("FOURSQUARE_SECRET")
 	redisURL := env.GetString("REDIS_URL", "")
 	redisPassword := env.GetString("REDIS_PASSWORD", "")
+	dbURL := env.MustGetString("DATABASE_URL")
 
 	// Dependency Injection goes here:
 	logger := jsonlogs.New(logLevel)
@@ -55,6 +62,20 @@ func main() {
 	// only working on top of the domain language, i.e. types and interfaces from the domain/ package
 	venuesController := venuesctrl.New(venuesService)
 
+	db, err := ksql.New("postgres", dbURL, ksql.Config{})
+	if err != nil {
+		logger.Fatal(ctx, "unable to start database", domain.LogBody{
+			"db_url": dbURL,
+			"error":  err.Error(),
+		})
+	}
+
+	usersRepo := usersrepo.New(db)
+
+	usersService := users.New(logger, usersRepo)
+
+	usersController := usersctrl.New(usersService)
+
 	// Any framework you need for serving HTTP or GRPC goes in the main package,
 	//
 	// It should be kept here because the main package is the only one that is allowed
@@ -68,8 +89,11 @@ func main() {
 	app.Get("/ping", func(c *fiber.Ctx) error {
 		return c.SendString("pong")
 	})
-	app.Get("/venues/<latitude>,<longitude>", adapter.Adapt(venuesController.GetVenuesByCoordinates))
-	app.Get("/venues/details/<id>", adapter.Adapt(venuesController.GetDetails))
+	app.Get("/venues/:latitude,:longitude", adapter.Adapt(venuesController.GetVenuesByCoordinates))
+	app.Get("/venues/details/:id", adapter.Adapt(venuesController.GetDetails))
+
+	app.Post("/users", usersController.UpsertUser)
+	app.Get("/users/:id", usersController.GetUser)
 
 	logger.Info(ctx, "server-starting-up", domain.LogBody{
 		"port": port,
