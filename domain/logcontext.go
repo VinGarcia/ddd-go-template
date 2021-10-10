@@ -29,8 +29,9 @@ func CtxWithValues(ctx context.Context, values LogBody) context.Context {
 func GetCtxValues(ctx context.Context) LogBody {
 	m, _ := ctx.Value(logCtxKey).(LogBody)
 	if m == nil {
-		return LogBody{}
+		m = LogBody{}
 	}
+	m["request_id"] = GetRequestIDFromContext(ctx)
 	return m
 }
 

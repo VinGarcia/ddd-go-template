@@ -30,6 +30,10 @@ func (s Service) UpsertUser(ctx context.Context, user domain.User) (userID int, 
 	if err != nil {
 		return 0, err
 	}
+
+	s.logger.Info(ctx, "user created", domain.LogBody{
+		"user_id": userID,
+	})
 	return userID, nil
 }
 
