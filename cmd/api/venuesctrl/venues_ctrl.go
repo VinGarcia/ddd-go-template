@@ -1,4 +1,4 @@
-package venues
+package venuesctrl
 
 import (
 	"context"
@@ -6,21 +6,23 @@ import (
 	"fmt"
 
 	"github.com/gofiber/fiber/v2"
+	"github.com/vingarcia/ddd-go-layout/domain/venues"
 )
 
 // The Controller can depend directly on the service with no intermediary interface.
 // This is ok because I don't usually test controllers (i.e. no need for mocking the service)
 //
-// I don't test it for two reasons:
+// And I don't test it for two reasons:
 //
 // 1. Controllers are expected to be simple, so unit testing it should not be that useful.
-// 2. There is a more complete way of testing that test the whole program including the controllers
-// which is to write api tests on `cmd/api/main_test.go`
+// 2. There is a more complete way of testing the whole program including the controllers
+// which is to write api tests on `cmd/api/main_test.go` and literally starting the API and
+// running requests on it, so if testing the controller is important I prefer writing API tests.
 type Controller struct {
-	venuesService Service
+	venuesService venues.Service
 }
 
-func NewController(venuesService Service) Controller {
+func New(venuesService venues.Service) Controller {
 	return Controller{
 		venuesService: venuesService,
 	}

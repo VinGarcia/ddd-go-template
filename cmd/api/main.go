@@ -6,6 +6,7 @@ import (
 
 	"github.com/gofiber/fiber/v2"
 	"github.com/vingarcia/ddd-go-layout/cmd/api/middlewares"
+	"github.com/vingarcia/ddd-go-layout/cmd/api/venuesctrl"
 	"github.com/vingarcia/ddd-go-layout/domain"
 	"github.com/vingarcia/ddd-go-layout/domain/venues"
 	"github.com/vingarcia/ddd-go-layout/infra/env"
@@ -52,7 +53,7 @@ func main() {
 
 	// The controllers handle HTTP stuff so the services can be kept as simple as possible
 	// only working on top of the domain language, i.e. types and interfaces from the domain/ package
-	venuesController := venues.NewController(venuesService)
+	venuesController := venuesctrl.New(venuesService)
 
 	// Any framework you need for serving HTTP or GRPC goes in the main package,
 	//
