@@ -5,6 +5,7 @@ import (
 	"time"
 
 	"github.com/gofiber/fiber/v2"
+	"github.com/vingarcia/ddd-go-layout/cmd/api/middlewares"
 	"github.com/vingarcia/ddd-go-layout/domain"
 	"github.com/vingarcia/ddd-go-layout/domain/venues"
 	"github.com/vingarcia/ddd-go-layout/infra/env"
@@ -60,8 +61,8 @@ func main() {
 	// so you won't reuse it anywhere else.
 	app := fiber.New()
 
-	app.Use(handleRequestID())
-	app.Use(handleError(logger))
+	app.Use(middlewares.HandleRequestID())
+	app.Use(middlewares.HandleError(logger))
 
 	app.Get("/ping", func(c *fiber.Ctx) error {
 		return c.SendString("pong")
@@ -72,7 +73,6 @@ func main() {
 	logger.Info(ctx, "server-starting-up", domain.LogBody{
 		"port": port,
 	})
-
 	if err := app.Listen(":" + port); err != nil {
 		logger.Error(ctx, "server-stopped-with-an-error", domain.LogBody{
 			"error": err.Error(),

@@ -5,7 +5,7 @@ import (
 	"encoding/json"
 	"fmt"
 
-	routing "github.com/jackwhelpton/fasthttp-routing/v2"
+	"github.com/gofiber/fiber/v2"
 )
 
 // The Controller can depend directly on the service with no intermediary interface.
@@ -26,7 +26,7 @@ func NewController(venuesService Service) Controller {
 	}
 }
 
-func (c Controller) GetVenuesByCoordinates(ctx *routing.Context, args struct {
+func (c Controller) GetVenuesByCoordinates(ctx *fiber.Ctx, args struct {
 	Latitude  string `path:"latitude"`
 	Longitude string `path:"longitude"`
 }) error {
@@ -41,12 +41,11 @@ func (c Controller) GetVenuesByCoordinates(ctx *routing.Context, args struct {
 	if err != nil {
 		return fmt.Errorf("error building GET venues response JSON: %s", err)
 	}
-	ctx.SetBody(rawJSON)
 
-	return nil
+	return ctx.Send(rawJSON)
 }
 
-func (c Controller) GetDetails(ctx *routing.Context, args struct {
+func (c Controller) GetDetails(ctx *fiber.Ctx, args struct {
 	ID string `path:"id"`
 }) error {
 	goCtx := context.Background()
@@ -56,7 +55,5 @@ func (c Controller) GetDetails(ctx *routing.Context, args struct {
 		return err
 	}
 
-	ctx.SetBody(venue)
-
-	return nil
+	return ctx.Send(venue)
 }

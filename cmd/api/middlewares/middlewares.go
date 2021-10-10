@@ -1,11 +1,11 @@
-package main
+package middlewares
 
 import (
 	"github.com/gofiber/fiber/v2"
 	"github.com/vingarcia/ddd-go-layout/domain"
 )
 
-func handleRequestID() func(c *fiber.Ctx) error {
+func HandleRequestID() func(c *fiber.Ctx) error {
 	return func(c *fiber.Ctx) error {
 		key, requestID := domain.GenerateRequestID()
 		c.Locals(key, requestID)
@@ -13,7 +13,7 @@ func handleRequestID() func(c *fiber.Ctx) error {
 	}
 }
 
-func handleError(logger domain.LogProvider) func(c *fiber.Ctx) error {
+func HandleError(logger domain.LogProvider) func(c *fiber.Ctx) error {
 	return func(c *fiber.Ctx) error {
 		err := c.Next()
 		if err == nil {
