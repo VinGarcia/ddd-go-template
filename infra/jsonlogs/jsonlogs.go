@@ -143,10 +143,11 @@ func buildJSONString(level string, title string, body domain.LogBody) string {
 		}
 	}
 
+	titleJSON, _ := json.Marshal(title)
 	return fmt.Sprintf(
 		`{"level":"%s","title":%s,"timestamp":"%s"%s%s`,
 		level,
-		title,
+		string(titleJSON),
 		timestamp,
 		separator,
 		string(bodyJSON[1:]),
