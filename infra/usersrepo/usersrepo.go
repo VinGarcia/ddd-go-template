@@ -12,7 +12,7 @@ type Client struct {
 	db ksql.Provider
 }
 
-func New(db ksql.Provider) Client {
+func NewClient(db ksql.Provider) Client {
 	return Client{
 		db: db,
 	}

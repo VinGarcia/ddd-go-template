@@ -22,8 +22,8 @@ type Client struct {
 	http http.Client
 }
 
-// New instantiates a new rest client
-func New(timeout time.Duration) Client {
+// NewClient instantiates a new rest client
+func NewClient(timeout time.Duration) Client {
 	return Client{
 		http.Client{
 			Timeout: timeout,

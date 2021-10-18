@@ -17,8 +17,8 @@ type Client struct {
 	PrintlnFn     func(...interface{})
 }
 
-// New builds a logger Client on the appropriate log level
-func New(level string) Client {
+// NewClient builds a logger Client on the appropriate log level
+func NewClient(level string) Client {
 	var priority uint
 	switch strings.ToUpper(level) {
 	case "DEBUG":

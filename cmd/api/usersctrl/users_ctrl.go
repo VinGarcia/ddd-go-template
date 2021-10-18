@@ -19,7 +19,7 @@ type Controller struct {
 	usersService users.Service
 }
 
-func New(usersService users.Service) Controller {
+func NewController(usersService users.Service) Controller {
 	return Controller{
 		usersService: usersService,
 	}

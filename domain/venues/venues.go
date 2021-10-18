@@ -18,7 +18,7 @@ type Service struct {
 	secret   string
 }
 
-func New(
+func NewService(
 	logger domain.LogProvider,
 	rest domain.RestProvider,
 	cache domain.CacheProvider,

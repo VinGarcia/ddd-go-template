@@ -13,7 +13,7 @@ import (
 	"github.com/stretchr/testify/assert"
 )
 
-func TestNew(t *testing.T) {
+func TestNewClient(t *testing.T) {
 	tests := []struct {
 		desc             string
 		level            string
@@ -48,7 +48,7 @@ func TestNew(t *testing.T) {
 
 	for _, test := range tests {
 		t.Run(test.desc, func(t *testing.T) {
-			instance := New(test.level)
+			instance := NewClient(test.level)
 			assert.Equal(t, test.expectedPriority, instance.priorityLevel)
 		})
 	}

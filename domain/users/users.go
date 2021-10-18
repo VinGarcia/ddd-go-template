@@ -11,7 +11,7 @@ type Service struct {
 	usersRepo domain.UsersRepo
 }
 
-func New(
+func NewService(
 	logger domain.LogProvider,
 	usersRepo domain.UsersRepo,
 ) Service {

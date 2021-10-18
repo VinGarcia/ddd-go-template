@@ -38,18 +38,18 @@ func main() {
 	dbURL := env.MustGetString("DATABASE_URL")
 
 	// Dependency Injection goes here:
-	logger := jsonlogs.New(logLevel)
+	logger := jsonlogs.NewClient(logLevel)
 
-	restClient := rest.New(30 * time.Second)
+	restClient := rest.NewClient(30 * time.Second)
 
 	var cacheClient domain.CacheProvider
 	if redisURL != "" {
-		cacheClient = redis.New(redisURL, redisPassword, 24*time.Hour)
+		cacheClient = redis.NewClient(redisURL, redisPassword, 24*time.Hour)
 	} else {
-		cacheClient = memorycache.New(24*time.Hour, 10*time.Minute)
+		cacheClient = memorycache.NewClient(24*time.Hour, 10*time.Minute)
 	}
 
-	venuesService := venues.New(
+	venuesService := venues.NewService(
 		logger,
 		restClient,
 		cacheClient,
@@ -60,7 +60,7 @@ func main() {
 
 	// The controllers handle HTTP stuff so the services can be kept as simple as possible
 	// only working on top of the domain language, i.e. types and interfaces from the domain/ package
-	venuesController := venuesctrl.New(venuesService)
+	venuesController := venuesctrl.NewController(venuesService)
 
 	db, err := ksql.New("postgres", dbURL, ksql.Config{})
 	if err != nil {
@@ -70,11 +70,11 @@ func main() {
 		})
 	}
 
-	usersRepo := usersrepo.New(db)
+	usersRepo := usersrepo.NewClient(db)
 
-	usersService := users.New(logger, usersRepo)
+	usersService := users.NewService(logger, usersRepo)
 
-	usersController := usersctrl.New(usersService)
+	usersController := usersctrl.NewController(usersService)
 
 	// Any framework you need for serving HTTP or GRPC goes in the main package,
 	//

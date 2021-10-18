@@ -21,7 +21,7 @@ type Controller struct {
 	venuesService venues.Service
 }
 
-func New(venuesService venues.Service) Controller {
+func NewController(venuesService venues.Service) Controller {
 	return Controller{
 		venuesService: venuesService,
 	}
