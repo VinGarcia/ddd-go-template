@@ -7,6 +7,15 @@ import (
 	"io"
 )
 
+// If this is your first time seeing
+// the embed package take a look at the official docs:
+//
+// - https://pkg.go.dev/embed
+//
+// In short the go embed package will load files during
+// compilation and save them inside the binary so you
+// deploy it to production without having to find a way of
+// copying the HTML there too.
 //go:embed *
 var htmlFS embed.FS
 
