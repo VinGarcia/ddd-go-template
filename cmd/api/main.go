@@ -5,6 +5,7 @@ import (
 	"time"
 
 	"github.com/gofiber/fiber/v2"
+	"github.com/vingarcia/ddd-go-layout/assets/html"
 	"github.com/vingarcia/ddd-go-layout/cmd/api/middlewares"
 	"github.com/vingarcia/ddd-go-layout/cmd/api/usersctrl"
 	"github.com/vingarcia/ddd-go-layout/cmd/api/venuesctrl"
@@ -84,7 +85,7 @@ func main() {
 	app := fiber.New()
 
 	app.Use(middlewares.HandleRequestID())
-	app.Use(middlewares.HandleError(logger))
+	// app.Use(middlewares.HandleError(logger))
 
 	app.Get("/ping", func(c *fiber.Ctx) error {
 		return c.SendString("pong")
@@ -94,6 +95,13 @@ func main() {
 
 	app.Post("/users", usersController.UpsertUser)
 	app.Get("/users/:id", usersController.GetUser)
+
+	// Just an example on how to serve html templates using the embed library
+	// and explicit arguments with a "builder function":
+	app.Get("/example-html", func(c *fiber.Ctx) error {
+		c.Set("Content-Type", "text/html")
+		return html.WriteExamplePage(c, "username", "user address", 42)
+	})
 
 	logger.Info(ctx, "server-starting-up", domain.LogBody{
 		"port": port,
