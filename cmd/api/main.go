@@ -85,7 +85,7 @@ func main() {
 	app := fiber.New()
 
 	app.Use(middlewares.HandleRequestID())
-	// app.Use(middlewares.HandleError(logger))
+	app.Use(middlewares.HandleError(logger))
 
 	app.Get("/ping", func(c *fiber.Ctx) error {
 		return c.SendString("pong")
