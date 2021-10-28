@@ -1,6 +1,8 @@
 package usersctrl
 
 import (
+	"encoding/json"
+
 	"github.com/gofiber/fiber/v2"
 	"github.com/vingarcia/ddd-go-layout/domain"
 	"github.com/vingarcia/ddd-go-layout/domain/users"
@@ -33,6 +35,14 @@ func (c Controller) UpsertUser(ctx *fiber.Ctx) error {
 		Name   string `json:"name"`
 		Age    int    `json:"age"`
 	}
+	err := json.Unmarshal(ctx.Body(), &user)
+	if err != nil {
+		return domain.BadRequestErr("unable to parse payload as JSON", map[string]interface{}{
+			"payload": string(ctx.Body()),
+			"error":   err.Error(),
+		})
+	}
+
 	userID, err := c.usersService.UpsertUser(ctx.Context(), domain.User{
 		// Showcasing that my internal model might differ from the API,
 		// in this case the internal name for the ID attribute is just ID not `UserID`:
