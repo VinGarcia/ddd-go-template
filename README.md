@@ -7,26 +7,31 @@ for [Dito](https://dito.com.br), they both deserve as much credit as me here.
 This very powerful, but yet flat and simple, template is organized in 3 directories:
 
 - **cmd/:** Each subdirectory is an entrypoint for the project,
-  e.g. a worker, an API or a CLI interface, each of these packages
-  are responsible for decoding the configurations, performing the
-  dependency injection and setting any Frameworks that might need to be setup
-  (in our case we are using the fasthttp as an HTTP framework).
+  e.g. a worker, an API or a CLI. Each of these packages
+  is responsible for decoding the configurations, performing the
+  dependency injection and setting up any Frameworks if necessary
+  (in our case we are using the Fiber as our HTTP framework).
 
-- **domain/:** This package contains the domain language and is meant to
-  be imported by all other packages in order to allow a decoupled comunication
-  between them.
+- **domain/:** This package contains the domain language, which is the minimum
+  shared languge that all packages are allowed to import. Thus, this package is
+  meant to be imported by all other packages in order to allow a decoupled
+  comunication between them.
 
-  Each subpackage of the domain is a Service, and its where we should concentrate
-  the domain logic.
+  Each subpackage of the domain pkg is a Service, and this is where we
+  should concentrate the domain logic.
 
-- **infra/:** each subdirectory contains either an adapter pattern making
-  an external functionality available to the domain in the form of an interface
-  (check the memorycache package for an example on this) or simple packages that
-  extract logic that is unrelated to the to domain in order to move as much code
-  away from the services as possible.
+- **infra/:** each subdirectory here contains an adapter, i.e. some code
+  that adapts an external dependency or logic that is unrelated to your domain
+  to an interface declared on `domain/contracts.go`.
+  
+  You can also have small helper packages here if necessary for operations that
+  are so simple that there is no need to rely on an external dependency.
+  
+  These package are meant to contain any logic that is unrelated to your domain
+  in order to move as much code as possible away from your services.
 
-  One other thing that we keep here are the repositories, which are the often the only
-  infra packages that actually use the entities directly, althought this is not prohibited
+  One other thing that we keep here are the repositories, which are often the only
+  infra packages that actually use the entities directly, although this is not prohibited
   by DDD.
 
   The idea here is that the Services contain the most complex and important parts of the project,
