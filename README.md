@@ -1,6 +1,6 @@
 # DDD Go Template
 
-This project was created to illustrate a great architectural structure
+This project was created to illustrate an intersting directory structure
 I developed together with [@fabiorodrigues](https://github.com/fabiorodrigues) in the period I was working
 for [Dito](https://dito.com.br), they both deserve as much credit as me here.
 
