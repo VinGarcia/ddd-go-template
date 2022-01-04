@@ -20,8 +20,6 @@ import (
 	"github.com/vingarcia/ddd-go-layout/infra/usersrepo"
 	"github.com/vingarcia/ksql"
 
-	adapter "github.com/vingarcia/go-adapter/fiber/v2"
-
 	_ "github.com/lib/pq"
 )
 
@@ -90,11 +88,12 @@ func main() {
 	app.Get("/ping", func(c *fiber.Ctx) error {
 		return c.SendString("pong")
 	})
-	app.Get("/venues/:latitude,:longitude", adapter.Adapt(venuesController.GetVenuesByCoordinates))
-	app.Get("/venues/details/:id", adapter.Adapt(venuesController.GetDetails))
 
 	app.Post("/users", usersController.UpsertUser)
 	app.Get("/users/:id", usersController.GetUser)
+
+	app.Get("/venues/:latitude,:longitude", venuesController.GetVenuesByCoordinates)
+	app.Get("/venues/details/:id", venuesController.GetDetails)
 
 	// Just an example on how to serve html templates using the embed library
 	// and explicit arguments with a "builder function":

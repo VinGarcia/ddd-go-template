@@ -9,6 +9,6 @@ require (
 	github.com/lib/pq v1.10.3
 	github.com/patrickmn/go-cache v2.1.0+incompatible
 	github.com/stretchr/testify v1.7.0
-	github.com/vingarcia/go-adapter v0.0.0-20211009181328-45bf4d57c367
 	github.com/vingarcia/ksql v1.1.0
+	golang.org/x/crypto v0.0.0-20210921155107-089bfa567519 // indirect
 )

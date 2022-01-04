@@ -51,6 +51,14 @@ func BadRequestErr(title string, data map[string]interface{}) DomainErr {
 	}
 }
 
+func UnauthorizedErr(title string, data map[string]interface{}) DomainErr {
+	return DomainErr{
+		code:  "UnauthorizedErr",
+		title: title,
+		data:  data,
+	}
+}
+
 func NotFoundErr(title string, data map[string]interface{}) DomainErr {
 	return DomainErr{
 		code:  "NotFoundErr",

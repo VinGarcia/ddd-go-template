@@ -27,11 +27,11 @@ func NewController(venuesService venues.Service) Controller {
 	}
 }
 
-func (c Controller) GetVenuesByCoordinates(ctx *fiber.Ctx, args struct {
-	Latitude  string `path:"latitude"`
-	Longitude string `path:"longitude"`
-}) error {
-	venues, err := c.venuesService.GetVenues(ctx.Context(), args.Latitude, args.Longitude)
+func (c Controller) GetVenuesByCoordinates(ctx *fiber.Ctx) error {
+	latitude := ctx.Params("latitude")
+	longitude := ctx.Params("latitude")
+
+	venues, err := c.venuesService.GetVenues(ctx.Context(), latitude, longitude)
 	if err != nil {
 		return err
 	}
@@ -44,10 +44,9 @@ func (c Controller) GetVenuesByCoordinates(ctx *fiber.Ctx, args struct {
 	return ctx.Send(rawJSON)
 }
 
-func (c Controller) GetDetails(ctx *fiber.Ctx, args struct {
-	ID string `path:"id"`
-}) error {
-	venue, err := c.venuesService.GetVenue(ctx.Context(), args.ID)
+func (c Controller) GetDetails(ctx *fiber.Ctx) error {
+	id := ctx.Params("id")
+	venue, err := c.venuesService.GetVenue(ctx.Context(), id)
 	if err != nil {
 		return err
 	}
