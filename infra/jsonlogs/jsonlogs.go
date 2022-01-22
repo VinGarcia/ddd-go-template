@@ -15,10 +15,14 @@ import (
 type Client struct {
 	priorityLevel uint
 	PrintlnFn     func(...interface{})
+
+	ctxParsers []ContextParser
 }
 
+type ContextParser func(ctx context.Context) domain.LogBody
+
 // NewClient builds a logger Client on the appropriate log level
-func NewClient(level string) Client {
+func NewClient(level string, parsers ...ContextParser) Client {
 	var priority uint
 	switch strings.ToUpper(level) {
 	case "DEBUG":
@@ -38,6 +42,7 @@ func NewClient(level string) Client {
 		PrintlnFn: func(args ...interface{}) {
 			fmt.Println(args...)
 		},
+		ctxParsers: parsers,
 	}
 }
 
@@ -48,11 +53,7 @@ func (c Client) Debug(ctx context.Context, title string, valueMaps ...domain.Log
 		return
 	}
 
-	body := domain.LogBody{}
-	domain.MergeToBody(&body, domain.GetCtxValues(ctx))
-	domain.MergeToBody(&body, valueMaps...)
-
-	c.PrintlnFn(buildJSONString("DEBUG", title, body))
+	c.log(ctx, "DEBUG", title, valueMaps)
 }
 
 // Info logs an entry on level "INFO" with the received title
@@ -62,11 +63,7 @@ func (c Client) Info(ctx context.Context, title string, valueMaps ...domain.LogB
 		return
 	}
 
-	body := domain.LogBody{}
-	domain.MergeToBody(&body, domain.GetCtxValues(ctx))
-	domain.MergeToBody(&body, valueMaps...)
-
-	c.PrintlnFn(buildJSONString("INFO", title, body))
+	c.log(ctx, "INFO", title, valueMaps)
 }
 
 // Warn logs an entry on level "WARN" with the received title
@@ -76,11 +73,7 @@ func (c Client) Warn(ctx context.Context, title string, valueMaps ...domain.LogB
 		return
 	}
 
-	body := domain.LogBody{}
-	domain.MergeToBody(&body, domain.GetCtxValues(ctx))
-	domain.MergeToBody(&body, valueMaps...)
-
-	c.PrintlnFn(buildJSONString("WARN", title, body))
+	c.log(ctx, "WARN", title, valueMaps)
 }
 
 // Error logs an entry on level "ERROR" with the received title
@@ -90,11 +83,7 @@ func (c Client) Error(ctx context.Context, title string, valueMaps ...domain.Log
 		return
 	}
 
-	body := domain.LogBody{}
-	domain.MergeToBody(&body, domain.GetCtxValues(ctx))
-	domain.MergeToBody(&body, valueMaps...)
-
-	c.PrintlnFn(buildJSONString("ERROR", title, body))
+	c.log(ctx, "ERROR", title, valueMaps)
 }
 
 // Fatal logs an entry on level "ERROR" with the received title
@@ -106,12 +95,18 @@ func (c Client) Fatal(ctx context.Context, title string, valueMaps ...domain.Log
 		return
 	}
 
+	c.log(ctx, "ERROR", title, valueMaps)
+	os.Exit(1)
+}
+
+func (c Client) log(ctx context.Context, level string, title string, valueMaps []domain.LogBody) {
 	body := domain.LogBody{}
-	domain.MergeToBody(&body, domain.GetCtxValues(ctx))
+	for _, parser := range c.ctxParsers {
+		domain.MergeToBody(&body, parser(ctx))
+	}
 	domain.MergeToBody(&body, valueMaps...)
 
-	c.PrintlnFn(buildJSONString("ERROR", title, body))
-	os.Exit(1)
+	c.PrintlnFn(buildJSONString(level, title, body))
 }
 
 func buildJSONString(level string, title string, body domain.LogBody) string {
