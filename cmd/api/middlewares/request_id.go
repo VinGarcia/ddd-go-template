@@ -7,8 +7,12 @@ import (
 
 func HandleRequestID() func(c *fiber.Ctx) error {
 	return func(c *fiber.Ctx) error {
-		key, requestID := domain.GenerateRequestID()
-		c.Locals(key, requestID)
+		requestID := c.Get("request-id")
+		if requestID == "" {
+			requestID = domain.GenerateRequestID()
+		}
+
+		c.Locals(domain.RequestIDKey, requestID)
 		return c.Next()
 	}
 }

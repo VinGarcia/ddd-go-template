@@ -6,13 +6,14 @@ import (
 	"github.com/google/uuid"
 )
 
-const requestIDKey = "request_id_key"
+// This needs to be a string, since its used on Fiber `.Locals()`
+const RequestIDKey string = "request_id_key"
 
-func GenerateRequestID() (requestIDKey string, id string) {
-	return "request_id_key", uuid.NewString()
+func GenerateRequestID() string {
+	return uuid.NewString()
 }
 
 func GetRequestIDFromContext(ctx context.Context) string {
-	requestID, _ := ctx.Value("request_id_key").(string)
+	requestID, _ := ctx.Value(RequestIDKey).(string)
 	return requestID
 }
