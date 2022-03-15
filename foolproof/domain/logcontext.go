@@ -10,6 +10,8 @@ package domain
 
 import (
 	"context"
+
+	"github.com/vingarcia/ddd-go-template/foolproof/infra/maps"
 )
 
 // Declaring a unique private type for the ctx key
@@ -35,20 +37,8 @@ func GetCtxValues(ctx context.Context) LogBody {
 	return m
 }
 
-func mergeMaps(maps ...LogBody) LogBody {
+func mergeMaps(bodies ...LogBody) LogBody {
 	body := LogBody{}
-	MergeToBody(&body, maps...)
+	maps.Merge(&body, bodies...)
 	return body
-}
-
-func MergeToBody(baseMap *LogBody, maps ...LogBody) {
-	if *baseMap == nil {
-		*baseMap = LogBody{}
-	}
-
-	for _, m := range maps {
-		for k, v := range m {
-			(*baseMap)[k] = v
-		}
-	}
 }

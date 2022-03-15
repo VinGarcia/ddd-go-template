@@ -9,6 +9,7 @@ import (
 	"time"
 
 	"github.com/vingarcia/ddd-go-template/foolproof/domain"
+	"github.com/vingarcia/ddd-go-template/foolproof/infra/maps"
 )
 
 // Client is the logger client, to instantiate it call `New()`
@@ -102,9 +103,9 @@ func (c Client) Fatal(ctx context.Context, title string, valueMaps ...domain.Log
 func (c Client) log(ctx context.Context, level string, title string, valueMaps []domain.LogBody) {
 	body := domain.LogBody{}
 	for _, parser := range c.ctxParsers {
-		domain.MergeToBody(&body, parser(ctx))
+		maps.Merge(&body, parser(ctx))
 	}
-	domain.MergeToBody(&body, valueMaps...)
+	maps.Merge(&body, valueMaps...)
 
 	c.PrintlnFn(buildJSONString(level, title, body))
 }

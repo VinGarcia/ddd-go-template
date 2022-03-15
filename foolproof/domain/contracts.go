@@ -31,7 +31,7 @@ type LogProvider interface {
 
 // Body is the log body containing the keys and values
 // used to build the structured logs
-type LogBody map[string]interface{}
+type LogBody = map[string]interface{}
 
 // Provider provides the functions to perform
 // REST requests automatically marshalling the input body as JSON.
