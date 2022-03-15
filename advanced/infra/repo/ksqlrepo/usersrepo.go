@@ -12,7 +12,7 @@ type UsersRepo struct {
 	db ksql.Provider
 }
 
-func NewUsersRepo(db ksql.Provider) UsersRepo {
+func newUsersRepo(db ksql.Provider) UsersRepo {
 	return UsersRepo{
 		db: db,
 	}

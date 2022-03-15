@@ -76,7 +76,7 @@ func main() {
 		})
 	}
 
-	usersRepo := ksqlrepo.NewUsersRepo(db)
+	usersRepo := ksqlrepo.New(db)
 
 	usersService := users.NewService(logger, usersRepo)
 
