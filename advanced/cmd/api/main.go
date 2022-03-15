@@ -71,7 +71,7 @@ func main() {
 		})
 	}
 
-	usersRepo := usersrepo.NewClient(db)
+	usersRepo := usersrepo.New(db)
 
 	usersService := users.NewService(logger, usersRepo)
 
