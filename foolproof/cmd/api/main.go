@@ -13,10 +13,10 @@ import (
 	"github.com/vingarcia/ddd-go-template/foolproof/domain/users"
 	"github.com/vingarcia/ddd-go-template/foolproof/domain/venues"
 	"github.com/vingarcia/ddd-go-template/foolproof/infra/env"
+	"github.com/vingarcia/ddd-go-template/foolproof/infra/http"
 	"github.com/vingarcia/ddd-go-template/foolproof/infra/jsonlogs"
 	"github.com/vingarcia/ddd-go-template/foolproof/infra/memorycache"
 	"github.com/vingarcia/ddd-go-template/foolproof/infra/redis"
-	"github.com/vingarcia/ddd-go-template/foolproof/infra/rest"
 	"github.com/vingarcia/ddd-go-template/foolproof/infra/usersrepo"
 	"github.com/vingarcia/ksql"
 
@@ -39,7 +39,7 @@ func main() {
 	// Dependency Injection goes here:
 	logger := jsonlogs.NewClient(logLevel, domain.GetCtxValues)
 
-	restClient := rest.NewClient(30 * time.Second)
+	restClient := http.NewClient(30 * time.Second)
 
 	var cacheClient domain.CacheProvider
 	if redisURL != "" {
