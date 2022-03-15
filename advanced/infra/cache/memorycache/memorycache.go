@@ -13,7 +13,7 @@ type Client struct {
 	cache *cache.Cache
 }
 
-func NewClient(defaultExpiration time.Duration, cleanupInterval time.Duration) Client {
+func New(defaultExpiration time.Duration, cleanupInterval time.Duration) Client {
 	return Client{
 		cache: cache.New(defaultExpiration, cleanupInterval),
 	}

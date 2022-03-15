@@ -14,7 +14,7 @@ type Client struct {
 	defaultExpiration time.Duration
 }
 
-func NewClient(
+func New(
 	connectionURL string,
 	password string,
 	defaultExpiration time.Duration,

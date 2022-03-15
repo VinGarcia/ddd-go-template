@@ -6,13 +6,14 @@ import (
 	"fmt"
 
 	"github.com/vingarcia/ddd-go-template/advanced/domain"
+	"github.com/vingarcia/ddd-go-template/advanced/infra/cache"
 	"github.com/vingarcia/ddd-go-template/advanced/infra/log"
 )
 
 type Service struct {
 	logger log.Provider
 	rest   domain.RestProvider
-	cache  domain.CacheProvider
+	cache  cache.Provider
 
 	baseURL  string
 	clientID string
@@ -22,7 +23,7 @@ type Service struct {
 func NewService(
 	logger log.Provider,
 	rest domain.RestProvider,
-	cache domain.CacheProvider,
+	cache cache.Provider,
 	baseURL string,
 	clientID string,
 	secret string,

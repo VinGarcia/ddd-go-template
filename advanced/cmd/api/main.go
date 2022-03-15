@@ -12,11 +12,12 @@ import (
 	"github.com/vingarcia/ddd-go-template/advanced/domain"
 	"github.com/vingarcia/ddd-go-template/advanced/domain/users"
 	"github.com/vingarcia/ddd-go-template/advanced/domain/venues"
+	"github.com/vingarcia/ddd-go-template/advanced/infra/cache"
+	"github.com/vingarcia/ddd-go-template/advanced/infra/cache/memorycache"
+	"github.com/vingarcia/ddd-go-template/advanced/infra/cache/redis"
 	"github.com/vingarcia/ddd-go-template/advanced/infra/env"
 	"github.com/vingarcia/ddd-go-template/advanced/infra/log"
 	"github.com/vingarcia/ddd-go-template/advanced/infra/log/jsonlogs"
-	"github.com/vingarcia/ddd-go-template/advanced/infra/memorycache"
-	"github.com/vingarcia/ddd-go-template/advanced/infra/redis"
 	"github.com/vingarcia/ddd-go-template/advanced/infra/rest"
 	"github.com/vingarcia/ddd-go-template/advanced/infra/usersrepo"
 	"github.com/vingarcia/ksql"
@@ -42,11 +43,11 @@ func main() {
 
 	restClient := rest.NewClient(30 * time.Second)
 
-	var cacheClient domain.CacheProvider
+	var cacheClient cache.Provider
 	if redisURL != "" {
-		cacheClient = redis.NewClient(redisURL, redisPassword, 24*time.Hour)
+		cacheClient = redis.New(redisURL, redisPassword, 24*time.Hour)
 	} else {
-		cacheClient = memorycache.NewClient(24*time.Hour, 10*time.Minute)
+		cacheClient = memorycache.New(24*time.Hour, 10*time.Minute)
 	}
 
 	venuesService := venues.NewService(
