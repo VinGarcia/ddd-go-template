@@ -5,6 +5,8 @@ import (
 	"encoding/json"
 	"fmt"
 	"strings"
+
+	"github.com/vingarcia/ddd-go-template/advanced/infra/log"
 )
 
 type DomainErr struct {
@@ -67,7 +69,7 @@ func NotFoundErr(title string, data map[string]interface{}) DomainErr {
 	}
 }
 
-func HandleDomainErrAsHTTP(ctx context.Context, logger LogProvider, err error, method string, path string) (status int, responseBody []byte) {
+func HandleDomainErrAsHTTP(ctx context.Context, logger log.Provider, err error, method string, path string) (status int, responseBody []byte) {
 	domainErr := AsDomainErr(err)
 
 	response := map[string]interface{}{
@@ -80,7 +82,7 @@ func HandleDomainErrAsHTTP(ctx context.Context, logger LogProvider, err error, m
 	case "InternalErr":
 		status = 500
 
-		data := LogBody{
+		data := log.Body{
 			"route": method + ": " + path,
 		}
 		for k, v := range domainErr.data {

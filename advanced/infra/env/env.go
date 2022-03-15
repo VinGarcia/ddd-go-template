@@ -1,5 +1,12 @@
 package env
 
+// This package is a helper package:
+// (1) it is very simple
+// (2) it only depends on stdlib
+//
+// It's so simple in fact that I don't care about decoupling from it,
+// so I wont write any interfaces here.
+
 import (
 	"fmt"
 	"os"

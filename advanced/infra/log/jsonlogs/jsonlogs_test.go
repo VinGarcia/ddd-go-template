@@ -9,11 +9,12 @@ import (
 	"time"
 
 	"github.com/vingarcia/ddd-go-template/advanced/domain"
+	"github.com/vingarcia/ddd-go-template/advanced/infra/log"
 
 	"github.com/stretchr/testify/assert"
 )
 
-func TestNewClient(t *testing.T) {
+func TestNew(t *testing.T) {
 	tests := []struct {
 		desc             string
 		level            string
@@ -48,7 +49,7 @@ func TestNewClient(t *testing.T) {
 
 	for _, test := range tests {
 		t.Run(test.desc, func(t *testing.T) {
-			instance := NewClient(test.level)
+			instance := New(test.level)
 			assert.Equal(t, test.expectedPriority, instance.priorityLevel)
 		})
 	}
@@ -59,14 +60,14 @@ func TestBuildJSONString(t *testing.T) {
 		desc           string
 		level          string
 		title          string
-		body           domain.LogBody
+		body           log.Body
 		expectedOutput map[string]interface{}
 	}{
 		{
 			desc:  "should work with empty bodies",
 			level: "fake-level",
 			title: "fake-title",
-			body:  domain.LogBody{},
+			body:  log.Body{},
 			expectedOutput: map[string]interface{}{
 				"level": "fake-level",
 				"title": "fake-title",
@@ -77,7 +78,7 @@ func TestBuildJSONString(t *testing.T) {
 			desc:  "should work with non empty bodies",
 			level: "fake-level",
 			title: "fake-title",
-			body: domain.LogBody{
+			body: log.Body{
 				"fake-key": "fake-timestamp",
 			},
 			expectedOutput: map[string]interface{}{
@@ -91,7 +92,7 @@ func TestBuildJSONString(t *testing.T) {
 			desc:  "should ignore reserved fields on body",
 			level: "fake-level",
 			title: "fake-title",
-			body: domain.LogBody{
+			body: log.Body{
 				"level":     "fake-level2",
 				"title":     "fake-title2",
 				"timestamp": "fake-timestamp2",
@@ -106,13 +107,13 @@ func TestBuildJSONString(t *testing.T) {
 			desc:  "should output an error log when unable to marshal the body",
 			level: "fake-level",
 			title: "fake-title",
-			body: domain.LogBody{
+			body: log.Body{
 				"value": CannotBeMarshaled{},
 			},
 			expectedOutput: map[string]interface{}{
 				"level": "ERROR",
 				"title": "could-not-marshal-log-body",
-				"body":  fmt.Sprintf("%#v", domain.LogBody{"value": CannotBeMarshaled{}}),
+				"body":  fmt.Sprintf("%#v", log.Body{"value": CannotBeMarshaled{}}),
 				// "timestamp": "can't compare timestamps",
 			},
 		},
@@ -148,7 +149,7 @@ func TestLogFuncs(t *testing.T) {
 			},
 		}
 
-		ctx = domain.CtxWithValues(ctx, domain.LogBody{
+		ctx = domain.CtxWithValues(ctx, log.Body{
 			"ctx_value1": "overwritten",
 			"ctx_value2": "overwritten",
 			"ctx_value3": "not-overwritten",
@@ -157,12 +158,12 @@ func TestLogFuncs(t *testing.T) {
 		client.Debug(
 			ctx,
 			"fake-log-title",
-			domain.LogBody{
+			log.Body{
 				"ctx_value1":   "overwrites",
 				"body1_value1": "overwritten",
 				"body1_value2": "not-overwritten",
 			},
-			domain.LogBody{
+			log.Body{
 				"ctx_value2":   "overwrites",
 				"body1_value1": "overwrites",
 				"body2_value1": "not-overwritten",
@@ -211,7 +212,7 @@ func TestLogFuncs(t *testing.T) {
 			},
 		}
 
-		ctx = domain.CtxWithValues(ctx, domain.LogBody{
+		ctx = domain.CtxWithValues(ctx, log.Body{
 			"ctx_value1": "overwritten",
 			"ctx_value2": "overwritten",
 			"ctx_value3": "not-overwritten",
@@ -220,12 +221,12 @@ func TestLogFuncs(t *testing.T) {
 		client.Info(
 			ctx,
 			"fake-log-title",
-			domain.LogBody{
+			log.Body{
 				"ctx_value1":   "overwrites",
 				"body1_value1": "overwritten",
 				"body1_value2": "not-overwritten",
 			},
-			domain.LogBody{
+			log.Body{
 				"ctx_value2":   "overwrites",
 				"body1_value1": "overwrites",
 				"body2_value1": "not-overwritten",
@@ -274,7 +275,7 @@ func TestLogFuncs(t *testing.T) {
 			},
 		}
 
-		ctx = domain.CtxWithValues(ctx, domain.LogBody{
+		ctx = domain.CtxWithValues(ctx, log.Body{
 			"ctx_value1": "overwritten",
 			"ctx_value2": "overwritten",
 			"ctx_value3": "not-overwritten",
@@ -283,12 +284,12 @@ func TestLogFuncs(t *testing.T) {
 		client.Warn(
 			ctx,
 			"fake-log-title",
-			domain.LogBody{
+			log.Body{
 				"ctx_value1":   "overwrites",
 				"body1_value1": "overwritten",
 				"body1_value2": "not-overwritten",
 			},
-			domain.LogBody{
+			log.Body{
 				"ctx_value2":   "overwrites",
 				"body1_value1": "overwrites",
 				"body2_value1": "not-overwritten",
@@ -337,7 +338,7 @@ func TestLogFuncs(t *testing.T) {
 			},
 		}
 
-		ctx = domain.CtxWithValues(ctx, domain.LogBody{
+		ctx = domain.CtxWithValues(ctx, log.Body{
 			"ctx_value1": "overwritten",
 			"ctx_value2": "overwritten",
 			"ctx_value3": "not-overwritten",
@@ -346,12 +347,12 @@ func TestLogFuncs(t *testing.T) {
 		client.Error(
 			ctx,
 			"fake-log-title",
-			domain.LogBody{
+			log.Body{
 				"ctx_value1":   "overwrites",
 				"body1_value1": "overwritten",
 				"body1_value2": "not-overwritten",
 			},
-			domain.LogBody{
+			log.Body{
 				"ctx_value2":   "overwrites",
 				"body1_value1": "overwrites",
 				"body2_value1": "not-overwritten",

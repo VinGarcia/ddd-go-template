@@ -8,7 +8,8 @@ import (
 	"strings"
 	"time"
 
-	"github.com/vingarcia/ddd-go-template/advanced/domain"
+	"github.com/vingarcia/ddd-go-template/advanced/infra/log"
+	"github.com/vingarcia/ddd-go-template/advanced/infra/maps"
 )
 
 // Client is the logger client, to instantiate it call `New()`
@@ -19,10 +20,10 @@ type Client struct {
 	ctxParsers []ContextParser
 }
 
-type ContextParser func(ctx context.Context) domain.LogBody
+type ContextParser func(ctx context.Context) log.Body
 
-// NewClient builds a logger Client on the appropriate log level
-func NewClient(level string, parsers ...ContextParser) Client {
+// New builds a logger Client on the appropriate log level
+func New(level string, parsers ...ContextParser) Client {
 	var priority uint
 	switch strings.ToUpper(level) {
 	case "DEBUG":
@@ -48,7 +49,7 @@ func NewClient(level string, parsers ...ContextParser) Client {
 
 // Debug logs an entry on level "DEBUG" with the received title
 // along with all the values collected from the input valueMaps and the context.
-func (c Client) Debug(ctx context.Context, title string, valueMaps ...domain.LogBody) {
+func (c Client) Debug(ctx context.Context, title string, valueMaps ...log.Body) {
 	if c.priorityLevel > 0 {
 		return
 	}
@@ -58,7 +59,7 @@ func (c Client) Debug(ctx context.Context, title string, valueMaps ...domain.Log
 
 // Info logs an entry on level "INFO" with the received title
 // along with all the values collected from the input valueMaps and the context.
-func (c Client) Info(ctx context.Context, title string, valueMaps ...domain.LogBody) {
+func (c Client) Info(ctx context.Context, title string, valueMaps ...log.Body) {
 	if c.priorityLevel > 1 {
 		return
 	}
@@ -68,7 +69,7 @@ func (c Client) Info(ctx context.Context, title string, valueMaps ...domain.LogB
 
 // Warn logs an entry on level "WARN" with the received title
 // along with all the values collected from the input valueMaps and the context.
-func (c Client) Warn(ctx context.Context, title string, valueMaps ...domain.LogBody) {
+func (c Client) Warn(ctx context.Context, title string, valueMaps ...log.Body) {
 	if c.priorityLevel > 2 {
 		return
 	}
@@ -78,7 +79,7 @@ func (c Client) Warn(ctx context.Context, title string, valueMaps ...domain.LogB
 
 // Error logs an entry on level "ERROR" with the received title
 // along with all the values collected from the input valueMaps and the context.
-func (c Client) Error(ctx context.Context, title string, valueMaps ...domain.LogBody) {
+func (c Client) Error(ctx context.Context, title string, valueMaps ...log.Body) {
 	if c.priorityLevel > 3 {
 		return
 	}
@@ -90,7 +91,7 @@ func (c Client) Error(ctx context.Context, title string, valueMaps ...domain.Log
 // along with all the values collected from the input valueMaps and the context.
 //
 // After that it proceeds to exit the program with code 1.
-func (c Client) Fatal(ctx context.Context, title string, valueMaps ...domain.LogBody) {
+func (c Client) Fatal(ctx context.Context, title string, valueMaps ...log.Body) {
 	if c.priorityLevel > 3 {
 		return
 	}
@@ -99,17 +100,17 @@ func (c Client) Fatal(ctx context.Context, title string, valueMaps ...domain.Log
 	os.Exit(1)
 }
 
-func (c Client) log(ctx context.Context, level string, title string, valueMaps []domain.LogBody) {
-	body := domain.LogBody{}
+func (c Client) log(ctx context.Context, level string, title string, valueMaps []log.Body) {
+	body := log.Body{}
 	for _, parser := range c.ctxParsers {
-		domain.MergeToBody(&body, parser(ctx))
+		maps.Merge(&body, parser(ctx))
 	}
-	domain.MergeToBody(&body, valueMaps...)
+	maps.Merge(&body, valueMaps...)
 
 	c.PrintlnFn(buildJSONString(level, title, body))
 }
 
-func buildJSONString(level string, title string, body domain.LogBody) string {
+func buildJSONString(level string, title string, body log.Body) string {
 	timestamp := time.Now().Format(time.RFC3339)
 
 	// Remove reserved keys from the input map:

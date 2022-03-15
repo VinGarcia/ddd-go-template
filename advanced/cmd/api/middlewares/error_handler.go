@@ -3,9 +3,10 @@ package middlewares
 import (
 	"github.com/gofiber/fiber/v2"
 	"github.com/vingarcia/ddd-go-template/advanced/domain"
+	"github.com/vingarcia/ddd-go-template/advanced/infra/log"
 )
 
-func HandleError(logger domain.LogProvider) func(c *fiber.Ctx) error {
+func HandleError(logger log.Provider) func(c *fiber.Ctx) error {
 	return func(c *fiber.Ctx) error {
 		err := c.Next()
 		if err == nil {

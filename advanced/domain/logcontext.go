@@ -10,6 +10,8 @@ package domain
 
 import (
 	"context"
+
+	"github.com/vingarcia/ddd-go-template/advanced/infra/maps"
 )
 
 // Declaring a unique private type for the ctx key
@@ -18,37 +20,27 @@ type logCtxKeyType uint8
 
 var logCtxKey logCtxKeyType
 
+type ctxBody = map[string]interface{}
+
 // CtxWithValues merges received values with log body currently stored
 // on the input ctx.
-func CtxWithValues(ctx context.Context, values LogBody) context.Context {
-	m, _ := ctx.Value(logCtxKey).(LogBody)
+func CtxWithValues(ctx context.Context, values ctxBody) context.Context {
+	m, _ := ctx.Value(logCtxKey).(ctxBody)
 	return context.WithValue(ctx, logCtxKey, mergeMaps(m, values))
 }
 
-// GetCtxValues extracts the log body currently stored on the input ctx.
-func GetCtxValues(ctx context.Context) LogBody {
-	m, _ := ctx.Value(logCtxKey).(LogBody)
+// GetCtxValues extracts the ctxBody currently stored on the input ctx.
+func GetCtxValues(ctx context.Context) ctxBody {
+	m, _ := ctx.Value(logCtxKey).(ctxBody)
 	if m == nil {
-		m = LogBody{}
+		m = ctxBody{}
 	}
 	m["request_id"] = GetRequestIDFromContext(ctx)
 	return m
 }
 
-func mergeMaps(maps ...LogBody) LogBody {
-	body := LogBody{}
-	MergeToBody(&body, maps...)
+func mergeMaps(bodies ...ctxBody) ctxBody {
+	body := ctxBody{}
+	maps.Merge(&body, bodies...)
 	return body
-}
-
-func MergeToBody(baseMap *LogBody, maps ...LogBody) {
-	if *baseMap == nil {
-		*baseMap = LogBody{}
-	}
-
-	for _, m := range maps {
-		for k, v := range m {
-			(*baseMap)[k] = v
-		}
-	}
 }

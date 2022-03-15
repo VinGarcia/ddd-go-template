@@ -4,15 +4,16 @@ import (
 	"context"
 
 	"github.com/vingarcia/ddd-go-template/advanced/domain"
+	"github.com/vingarcia/ddd-go-template/advanced/infra/log"
 )
 
 type Service struct {
-	logger    domain.LogProvider
+	logger    log.Provider
 	usersRepo domain.UsersRepo
 }
 
 func NewService(
-	logger domain.LogProvider,
+	logger log.Provider,
 	usersRepo domain.UsersRepo,
 ) Service {
 	return Service{
@@ -31,7 +32,7 @@ func (s Service) UpsertUser(ctx context.Context, user domain.User) (userID int, 
 		return 0, err
 	}
 
-	s.logger.Info(ctx, "user created", domain.LogBody{
+	s.logger.Info(ctx, "user created", log.Body{
 		"user_id": userID,
 	})
 	return userID, nil

@@ -13,7 +13,8 @@ import (
 	"github.com/vingarcia/ddd-go-template/advanced/domain/users"
 	"github.com/vingarcia/ddd-go-template/advanced/domain/venues"
 	"github.com/vingarcia/ddd-go-template/advanced/infra/env"
-	"github.com/vingarcia/ddd-go-template/advanced/infra/jsonlogs"
+	"github.com/vingarcia/ddd-go-template/advanced/infra/log"
+	"github.com/vingarcia/ddd-go-template/advanced/infra/log/jsonlogs"
 	"github.com/vingarcia/ddd-go-template/advanced/infra/memorycache"
 	"github.com/vingarcia/ddd-go-template/advanced/infra/redis"
 	"github.com/vingarcia/ddd-go-template/advanced/infra/rest"
@@ -37,7 +38,7 @@ func main() {
 	dbURL := env.MustGetString("DATABASE_URL")
 
 	// Dependency Injection goes here:
-	logger := jsonlogs.NewClient(logLevel, domain.GetCtxValues)
+	logger := jsonlogs.New(logLevel, domain.GetCtxValues)
 
 	restClient := rest.NewClient(30 * time.Second)
 
@@ -63,7 +64,7 @@ func main() {
 
 	db, err := ksql.New("postgres", dbURL, ksql.Config{})
 	if err != nil {
-		logger.Fatal(ctx, "unable to start database", domain.LogBody{
+		logger.Fatal(ctx, "unable to start database", log.Body{
 			"db_url": dbURL,
 			"error":  err.Error(),
 		})
@@ -103,11 +104,11 @@ func main() {
 		return html.WriteExamplePage(c, "username", "user address", 42)
 	})
 
-	logger.Info(ctx, "server-starting-up", domain.LogBody{
+	logger.Info(ctx, "server-starting-up", log.Body{
 		"port": port,
 	})
 	if err := app.Listen(":" + port); err != nil {
-		logger.Error(ctx, "server-stopped-with-an-error", domain.LogBody{
+		logger.Error(ctx, "server-stopped-with-an-error", log.Body{
 			"error": err.Error(),
 		})
 	}

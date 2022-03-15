@@ -6,10 +6,11 @@ import (
 	"fmt"
 
 	"github.com/vingarcia/ddd-go-template/advanced/domain"
+	"github.com/vingarcia/ddd-go-template/advanced/infra/log"
 )
 
 type Service struct {
-	logger domain.LogProvider
+	logger log.Provider
 	rest   domain.RestProvider
 	cache  domain.CacheProvider
 
@@ -19,7 +20,7 @@ type Service struct {
 }
 
 func NewService(
-	logger domain.LogProvider,
+	logger log.Provider,
 	rest domain.RestProvider,
 	cache domain.CacheProvider,
 	baseURL string,
@@ -40,7 +41,7 @@ func (s Service) GetVenues(ctx context.Context, latitude string, longitude strin
 	url := fmt.Sprintf("%s/venues/search?client_id=%s&client_secret=%s&v=20210514&ll=%s,%s", s.baseURL, s.clientID, s.secret, latitude, longitude)
 	resp, err := s.rest.Get(ctx, url, domain.RequestData{})
 	if err != nil {
-		s.logger.Error(ctx, "error-retrieving-venues-from-foursquare-by-coordinates", domain.LogBody{
+		s.logger.Error(ctx, "error-retrieving-venues-from-foursquare-by-coordinates", log.Body{
 			"latitude":  latitude,
 			"longitude": longitude,
 			"payload":   string(resp.Body),
@@ -73,7 +74,7 @@ func (s Service) GetVenue(ctx context.Context, venueID string) ([]byte, error) {
 	err := s.cache.Get(ctx, venueID, &cachedVenue)
 	if err == nil {
 		// Log IDs, not payloads whenever possible, except when errors happen, then log everything.
-		s.logger.Debug(ctx, "fetching-venue-from-cache", domain.LogBody{
+		s.logger.Debug(ctx, "fetching-venue-from-cache", log.Body{
 			"venue_id": venueID,
 		})
 		return cachedVenue, nil
@@ -82,7 +83,7 @@ func (s Service) GetVenue(ctx context.Context, venueID string) ([]byte, error) {
 	url := fmt.Sprintf("%s/venues/%s?client_id=%s&client_secret=%s&v=20210514", s.baseURL, venueID, s.clientID, s.secret)
 	resp, err := s.rest.Get(ctx, url, domain.RequestData{})
 	if err != nil {
-		s.logger.Error(ctx, "error-fetching-venue-by-latitude-from-foursquare", domain.LogBody{
+		s.logger.Error(ctx, "error-fetching-venue-by-latitude-from-foursquare", log.Body{
 			"venue_id": venueID,
 			"error":    err.Error(),
 			"payload":  string(resp.Body),
@@ -90,7 +91,7 @@ func (s Service) GetVenue(ctx context.Context, venueID string) ([]byte, error) {
 		return nil, err
 	}
 
-	s.logger.Debug(ctx, "adding-venue-to-cache", domain.LogBody{
+	s.logger.Debug(ctx, "adding-venue-to-cache", log.Body{
 		"venue_id": venueID,
 	})
 	err = s.cache.Set(ctx, venueID, resp.Body)
