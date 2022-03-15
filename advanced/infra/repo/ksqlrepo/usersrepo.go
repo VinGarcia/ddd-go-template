@@ -1,4 +1,4 @@
-package usersrepo
+package ksqlrepo
 
 import (
 	"context"
@@ -8,23 +8,23 @@ import (
 	"github.com/vingarcia/ksql"
 )
 
-type Client struct {
+type UsersRepo struct {
 	db ksql.Provider
 }
 
-func New(db ksql.Provider) Client {
-	return Client{
+func NewUsersRepo(db ksql.Provider) UsersRepo {
+	return UsersRepo{
 		db: db,
 	}
 }
 
-func (c Client) UpsertUser(ctx context.Context, user domain.User) (userID int, _ error) {
+func (u UsersRepo) UpsertUser(ctx context.Context, user domain.User) (userID int, _ error) {
 	now := time.Now()
 	user.UpdatedAt = &now
-	err := c.db.Update(ctx, domain.UsersTable, &user)
+	err := u.db.Update(ctx, domain.UsersTable, &user)
 	if err == ksql.ErrRecordNotFound {
 		user.CreatedAt = &now
-		err = c.db.Insert(ctx, domain.UsersTable, &user)
+		err = u.db.Insert(ctx, domain.UsersTable, &user)
 	}
 	if err != nil {
 		return 0, domain.InternalErr("unexpected error when saving user", map[string]interface{}{
@@ -36,9 +36,9 @@ func (c Client) UpsertUser(ctx context.Context, user domain.User) (userID int, _
 	return user.ID, nil
 }
 
-func (c Client) GetUser(ctx context.Context, userID int) (domain.User, error) {
+func (u UsersRepo) GetUser(ctx context.Context, userID int) (domain.User, error) {
 	var user domain.User
-	err := c.db.QueryOne(ctx, &user, "FROM users WHERE id = $1", userID)
+	err := u.db.QueryOne(ctx, &user, "FROM users WHERE id = $1", userID)
 	if err == ksql.ErrRecordNotFound {
 		return domain.User{}, domain.NotFoundErr("no user found with provided id", map[string]interface{}{
 			"user_id": userID,

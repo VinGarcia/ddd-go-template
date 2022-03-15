@@ -5,13 +5,17 @@ import (
 	"time"
 
 	"github.com/gofiber/fiber/v2"
+
 	"github.com/vingarcia/ddd-go-template/advanced/assets/html"
+
 	"github.com/vingarcia/ddd-go-template/advanced/cmd/api/middlewares"
 	"github.com/vingarcia/ddd-go-template/advanced/cmd/api/usersctrl"
 	"github.com/vingarcia/ddd-go-template/advanced/cmd/api/venuesctrl"
+
 	"github.com/vingarcia/ddd-go-template/advanced/domain"
 	"github.com/vingarcia/ddd-go-template/advanced/domain/users"
 	"github.com/vingarcia/ddd-go-template/advanced/domain/venues"
+
 	"github.com/vingarcia/ddd-go-template/advanced/infra/cache"
 	"github.com/vingarcia/ddd-go-template/advanced/infra/cache/memorycache"
 	"github.com/vingarcia/ddd-go-template/advanced/infra/cache/redis"
@@ -19,7 +23,8 @@ import (
 	"github.com/vingarcia/ddd-go-template/advanced/infra/log"
 	"github.com/vingarcia/ddd-go-template/advanced/infra/log/jsonlogs"
 	"github.com/vingarcia/ddd-go-template/advanced/infra/rest/http"
-	"github.com/vingarcia/ddd-go-template/advanced/infra/usersrepo"
+
+	"github.com/vingarcia/ddd-go-template/advanced/infra/repo/ksqlrepo"
 	"github.com/vingarcia/ksql"
 
 	_ "github.com/lib/pq"
@@ -71,7 +76,7 @@ func main() {
 		})
 	}
 
-	usersRepo := usersrepo.New(db)
+	usersRepo := ksqlrepo.NewUsersRepo(db)
 
 	usersService := users.NewService(logger, usersRepo)
 

@@ -5,16 +5,17 @@ import (
 
 	"github.com/vingarcia/ddd-go-template/advanced/domain"
 	"github.com/vingarcia/ddd-go-template/advanced/infra/log"
+	"github.com/vingarcia/ddd-go-template/advanced/infra/repo"
 )
 
 type Service struct {
 	logger    log.Provider
-	usersRepo domain.UsersRepo
+	usersRepo repo.Users
 }
 
 func NewService(
 	logger log.Provider,
-	usersRepo domain.UsersRepo,
+	usersRepo repo.Users,
 ) Service {
 	return Service{
 		logger:    logger,
