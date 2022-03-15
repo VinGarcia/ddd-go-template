@@ -4,8 +4,8 @@ import (
 	"encoding/json"
 
 	"github.com/gofiber/fiber/v2"
-	"github.com/vingarcia/ddd-go-layout/domain"
-	"github.com/vingarcia/ddd-go-layout/domain/users"
+	"github.com/vingarcia/ddd-go-template/foolproof/domain"
+	"github.com/vingarcia/ddd-go-template/foolproof/domain/users"
 )
 
 // The Controller can depend directly on the service with no intermediary interface.

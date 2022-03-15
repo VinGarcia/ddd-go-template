@@ -6,7 +6,7 @@ import (
 	"time"
 
 	cache "github.com/patrickmn/go-cache"
-	"github.com/vingarcia/ddd-go-layout/domain"
+	"github.com/vingarcia/ddd-go-template/foolproof/domain"
 )
 
 type Client struct {

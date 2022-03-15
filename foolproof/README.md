@@ -1,6 +1,6 @@
-# DDD Go Template
+# DDD Go Template - Fool Proof version
 
-This project was created to illustrate an intersting directory structure
+This project was created to illustrate an interesting directory structure
 I developed together with [@fabiorodrigues](https://github.com/fabiorodrigues) in the period I was working
 for [Dito](https://dito.com.br), they both deserve as much credit as me here.
 
@@ -23,10 +23,10 @@ This very powerful, but yet flat and simple template is organized in 3 directori
 - **infra/:** each subdirectory here contains an adapter, i.e. some code
   that adapts an external dependency or logic that is unrelated to your domain
   to an interface declared on `domain/contracts.go`.
-  
+
   You can also have small helper packages here if necessary for operations that
   are so simple that there is no need to rely on an external dependency.
-  
+
   These infra packages are meant to contain any logic that is unrelated
   to your domain in order to move as much code as possible away from your services.
 

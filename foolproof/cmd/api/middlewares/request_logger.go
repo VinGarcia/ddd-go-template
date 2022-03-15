@@ -4,7 +4,7 @@ import (
 	"time"
 
 	"github.com/gofiber/fiber/v2"
-	"github.com/vingarcia/ddd-go-layout/domain"
+	"github.com/vingarcia/ddd-go-template/foolproof/domain"
 )
 
 func RequestLogger(logger domain.LogProvider) func(c *fiber.Ctx) error {

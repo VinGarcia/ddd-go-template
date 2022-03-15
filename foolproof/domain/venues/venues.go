@@ -5,7 +5,7 @@ import (
 	"encoding/json"
 	"fmt"
 
-	"github.com/vingarcia/ddd-go-layout/domain"
+	"github.com/vingarcia/ddd-go-template/foolproof/domain"
 )
 
 type Service struct {

@@ -1,4 +1,4 @@
-module github.com/vingarcia/ddd-go-layout
+module github.com/vingarcia/ddd-go-template/foolproof
 
 go 1.16
 

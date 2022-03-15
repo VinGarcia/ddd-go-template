@@ -2,7 +2,7 @@ package middlewares
 
 import (
 	"github.com/gofiber/fiber/v2"
-	"github.com/vingarcia/ddd-go-layout/domain"
+	"github.com/vingarcia/ddd-go-template/foolproof/domain"
 )
 
 func HandleRequestID() func(c *fiber.Ctx) error {

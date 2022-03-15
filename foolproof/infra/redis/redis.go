@@ -6,7 +6,7 @@ import (
 	"time"
 
 	redis "github.com/go-redis/redis/v8"
-	"github.com/vingarcia/ddd-go-layout/domain"
+	"github.com/vingarcia/ddd-go-template/foolproof/domain"
 )
 
 type Client struct {

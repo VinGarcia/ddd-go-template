@@ -11,7 +11,7 @@ import (
 	"strings"
 	"time"
 
-	"github.com/vingarcia/ddd-go-layout/domain"
+	"github.com/vingarcia/ddd-go-template/foolproof/domain"
 )
 
 // Client contains methods for making rest requests

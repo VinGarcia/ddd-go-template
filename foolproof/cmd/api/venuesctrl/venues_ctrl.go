@@ -5,7 +5,7 @@ import (
 	"fmt"
 
 	"github.com/gofiber/fiber/v2"
-	"github.com/vingarcia/ddd-go-layout/domain/venues"
+	"github.com/vingarcia/ddd-go-template/foolproof/domain/venues"
 )
 
 // The Controller can depend directly on the service with no intermediary interface.

@@ -8,7 +8,7 @@ import (
 	"strings"
 	"time"
 
-	"github.com/vingarcia/ddd-go-layout/domain"
+	"github.com/vingarcia/ddd-go-template/foolproof/domain"
 )
 
 // Client is the logger client, to instantiate it call `New()`

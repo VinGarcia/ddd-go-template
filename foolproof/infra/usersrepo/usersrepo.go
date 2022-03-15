@@ -4,7 +4,7 @@ import (
 	"context"
 	"time"
 
-	"github.com/vingarcia/ddd-go-layout/domain"
+	"github.com/vingarcia/ddd-go-template/foolproof/domain"
 	"github.com/vingarcia/ksql"
 )
 
