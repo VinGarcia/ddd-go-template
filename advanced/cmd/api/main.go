@@ -18,7 +18,7 @@ import (
 	"github.com/vingarcia/ddd-go-template/advanced/infra/env"
 	"github.com/vingarcia/ddd-go-template/advanced/infra/log"
 	"github.com/vingarcia/ddd-go-template/advanced/infra/log/jsonlogs"
-	"github.com/vingarcia/ddd-go-template/advanced/infra/rest"
+	"github.com/vingarcia/ddd-go-template/advanced/infra/rest/http"
 	"github.com/vingarcia/ddd-go-template/advanced/infra/usersrepo"
 	"github.com/vingarcia/ksql"
 
@@ -41,7 +41,7 @@ func main() {
 	// Dependency Injection goes here:
 	logger := jsonlogs.New(logLevel, domain.GetCtxValues)
 
-	restClient := rest.NewClient(30 * time.Second)
+	restClient := http.New(30 * time.Second)
 
 	var cacheClient cache.Provider
 	if redisURL != "" {

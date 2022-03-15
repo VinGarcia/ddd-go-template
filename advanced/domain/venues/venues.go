@@ -8,11 +8,12 @@ import (
 	"github.com/vingarcia/ddd-go-template/advanced/domain"
 	"github.com/vingarcia/ddd-go-template/advanced/infra/cache"
 	"github.com/vingarcia/ddd-go-template/advanced/infra/log"
+	"github.com/vingarcia/ddd-go-template/advanced/infra/rest"
 )
 
 type Service struct {
 	logger log.Provider
-	rest   domain.RestProvider
+	rest   rest.Provider
 	cache  cache.Provider
 
 	baseURL  string
@@ -22,7 +23,7 @@ type Service struct {
 
 func NewService(
 	logger log.Provider,
-	rest domain.RestProvider,
+	rest rest.Provider,
 	cache cache.Provider,
 	baseURL string,
 	clientID string,
@@ -40,7 +41,7 @@ func NewService(
 
 func (s Service) GetVenues(ctx context.Context, latitude string, longitude string) ([]domain.Venue, error) {
 	url := fmt.Sprintf("%s/venues/search?client_id=%s&client_secret=%s&v=20210514&ll=%s,%s", s.baseURL, s.clientID, s.secret, latitude, longitude)
-	resp, err := s.rest.Get(ctx, url, domain.RequestData{})
+	resp, err := s.rest.Get(ctx, url, rest.RequestData{})
 	if err != nil {
 		s.logger.Error(ctx, "error-retrieving-venues-from-foursquare-by-coordinates", log.Body{
 			"latitude":  latitude,
@@ -82,7 +83,7 @@ func (s Service) GetVenue(ctx context.Context, venueID string) ([]byte, error) {
 	}
 
 	url := fmt.Sprintf("%s/venues/%s?client_id=%s&client_secret=%s&v=20210514", s.baseURL, venueID, s.clientID, s.secret)
-	resp, err := s.rest.Get(ctx, url, domain.RequestData{})
+	resp, err := s.rest.Get(ctx, url, rest.RequestData{})
 	if err != nil {
 		s.logger.Error(ctx, "error-fetching-venue-by-latitude-from-foursquare", log.Body{
 			"venue_id": venueID,

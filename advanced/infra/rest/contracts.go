@@ -1,4 +1,4 @@
-package domain
+package rest
 
 import "context"
 
@@ -10,7 +10,7 @@ import "context"
 //
 // Otherwise the statusCode should be used to check if the request
 // was processed successfully.
-type RestProvider interface {
+type Provider interface {
 	Get(ctx context.Context, url string, data RequestData) (resp Response, err error)
 	Post(ctx context.Context, url string, data RequestData) (resp Response, err error)
 	Put(ctx context.Context, url string, data RequestData) (resp Response, err error)

@@ -1,4 +1,4 @@
-package rest
+package http
 
 import (
 	"bytes"
@@ -11,7 +11,7 @@ import (
 	"strings"
 	"time"
 
-	"github.com/vingarcia/ddd-go-template/advanced/domain"
+	"github.com/vingarcia/ddd-go-template/advanced/infra/rest"
 )
 
 // Client contains methods for making rest requests
@@ -22,8 +22,8 @@ type Client struct {
 	http http.Client
 }
 
-// NewClient instantiates a new rest client
-func NewClient(timeout time.Duration) Client {
+// New instantiates a new http client
+func New(timeout time.Duration) Client {
 	return Client{
 		http.Client{
 			Timeout: timeout,
@@ -33,31 +33,31 @@ func NewClient(timeout time.Duration) Client {
 
 // Get will make a GET request to the input URL
 // and return the results
-func (c Client) Get(ctx context.Context, url string, data domain.RequestData) (domain.Response, error) {
+func (c Client) Get(ctx context.Context, url string, data rest.RequestData) (rest.Response, error) {
 	return c.makeRequest(ctx, "GET", url, data)
 }
 
 // Post will make a POST request to the input URL
 // and return the results
-func (c Client) Post(ctx context.Context, url string, data domain.RequestData) (domain.Response, error) {
+func (c Client) Post(ctx context.Context, url string, data rest.RequestData) (rest.Response, error) {
 	return c.makeRequest(ctx, "POST", url, data)
 }
 
 // Put will make a PUT request to the input URL
 // and return the results
-func (c Client) Put(ctx context.Context, url string, data domain.RequestData) (domain.Response, error) {
+func (c Client) Put(ctx context.Context, url string, data rest.RequestData) (rest.Response, error) {
 	return c.makeRequest(ctx, "PUT", url, data)
 }
 
 // Patch will make a PATCH request to the input URL
 // and return the results
-func (c Client) Patch(ctx context.Context, url string, data domain.RequestData) (domain.Response, error) {
+func (c Client) Patch(ctx context.Context, url string, data rest.RequestData) (rest.Response, error) {
 	return c.makeRequest(ctx, "PATCH", url, data)
 }
 
 // Delete will make a DELETE request to the input URL
 // and return the results
-func (c Client) Delete(ctx context.Context, url string, data domain.RequestData) (domain.Response, error) {
+func (c Client) Delete(ctx context.Context, url string, data rest.RequestData) (rest.Response, error) {
 	return c.makeRequest(ctx, "DELETE", url, data)
 }
 
@@ -65,8 +65,8 @@ func (c Client) makeRequest(
 	ctx context.Context,
 	method string,
 	url string,
-	data domain.RequestData,
-) (_ domain.Response, err error) {
+	data rest.RequestData,
+) (_ rest.Response, err error) {
 	var requestBody io.Reader
 	switch body := data.Body.(type) {
 	case nil:
@@ -80,14 +80,14 @@ func (c Client) makeRequest(
 	default:
 		inputBodyJSON, err := json.Marshal(data.Body)
 		if err != nil {
-			return domain.Response{}, err
+			return rest.Response{}, err
 		}
 		requestBody = bytes.NewReader(inputBodyJSON)
 	}
 
 	req, err := http.NewRequestWithContext(ctx, method, url, requestBody)
 	if err != nil {
-		return domain.Response{}, err
+		return rest.Response{}, err
 	}
 
 	for k, v := range data.Headers {
@@ -97,7 +97,7 @@ func (c Client) makeRequest(
 	var resp *http.Response
 	resp, err = c.http.Do(req)
 	if err != nil {
-		return domain.Response{}, err
+		return rest.Response{}, err
 	}
 
 	header := map[string]string{}
@@ -120,7 +120,7 @@ func (c Client) makeRequest(
 	}
 	resp.Body.Close()
 
-	return domain.Response{
+	return rest.Response{
 		Body:       body,
 		Header:     header,
 		StatusCode: resp.StatusCode,
