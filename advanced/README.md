@@ -1,47 +1,29 @@
-# DDD Go Template - Fool Proof version
+# DDD Go Template - Advanced version
 
-This project was created to illustrate an interesting directory structure
-I developed together with [@fabiorodrigues](https://github.com/fabiorodrigues) in the period I was working
-for [Dito](https://dito.com.br), they both deserve as much credit as me here.
+If you haven't read yet, I recommend reading the `foolproof/README.md` first.
 
-This very powerful, but yet flat and simple template is organized in 3 directories:
+This example template has the same logical structure as the `foolproof` version,
+but organizes the interfaces and DTOs in a way that allows better names, such as:
 
-- **cmd/:** Each subdirectory is an entry point for the project,
-  e.g. a worker, an API or a CLI. Each of these packages
-  is responsible for decoding the configurations, performing the
-  dependency injection and setting up any Frameworks if necessary
-  (in our case we are using the Fiber as our HTTP framework).
+- `rest.Provider` instead of `domain.RestProvider`
+- `cache.Provider` instead of `domain.CacheProvider`
 
-- **domain/:** This package contains the domain language, which is the minimum
-  shared language that all packages are allowed to import. Thus, this package is
-  meant to be imported by all other packages in order to allow decoupled
-  communication between them.
+## Reorganizing the infra package
 
-  Each subpackage of the domain pkg is a Service, and this is where we
-  should concentrate the domain logic.
+For that we reorganized all adapters in the `infra/` package by nesting
+them inside a package that contains the interface they implement, e.g.:
 
-- **infra/:** each subdirectory here contains an adapter, i.e. some code
-  that adapts an external dependency or logic that is unrelated to your domain
-  to an interface declared on `domain/contracts.go`.
+- The `infra/http` package was moved to `infra/rest/http`
+- The `infra/memorycache` package was moved to `infra/cache/memorycache`
+- The `infra/redis` package was moved to `infra/cache/redis`
 
-  You can also have small helper packages here if necessary for operations that
-  are so simple that there is no need to rely on an external dependency.
+And so on.
 
-  These infra packages are meant to contain any logic that is unrelated
-  to your domain in order to move as much code as possible away from your services.
+For each of these new packages a new file `contracts.go` was created containing
+only the relevant interfaces for that dependency, so now we have 3 new files with that name:
 
-  One other thing that we keep here are the repositories, which are often the only
-  infra packages that actually use the entities directly, although this is not prohibited
-  by DDD.
+- `infra/rest/contracts.go`
+- `infra/cache/contracts.go`
+- `infra/cache/contracts.go`
 
-  The idea here is that the Services contain the most complex and important parts of the project,
-  thus, by moving any logic that is not related to the domain away from the Services we can
-  keep the Services as simple as they can possibly be, which makes the code a lot easier to maintain.
-
-For Portuguese readers we have a more descriptive explanation of this architecture here:
-
-- [Domain Driven Design Aplicado a um Microserviço Go](https://eng.dito.com.br/domain-driven-design-ddd-aplicado-a-um-microservico-go)
-
-And if you prefer to watch a presentation (also in Portuguese) we have this one:
-
-- [29º Go Talks BH](https://youtu.be/ODft0k1LeHU)
+And the old `domain/contracts.go` was deleted.
