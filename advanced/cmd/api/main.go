@@ -24,7 +24,9 @@ import (
 	"github.com/vingarcia/ddd-go-template/advanced/infra/log/jsonlogs"
 	"github.com/vingarcia/ddd-go-template/advanced/infra/rest/http"
 
-	"github.com/vingarcia/ddd-go-template/advanced/infra/repo/ksqlrepo"
+	"github.com/vingarcia/ddd-go-template/advanced/infra/repo"
+	"github.com/vingarcia/ddd-go-template/advanced/infra/repo/ksqlusers"
+
 	"github.com/vingarcia/ksql"
 
 	_ "github.com/lib/pq"
@@ -76,7 +78,7 @@ func main() {
 		})
 	}
 
-	usersRepo := ksqlrepo.New(db)
+	var usersRepo repo.Users = ksqlusers.New(db)
 
 	usersService := users.NewService(logger, usersRepo)
 

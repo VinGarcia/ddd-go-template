@@ -1,4 +1,4 @@
-package ksqlrepo
+package ksqlusers
 
 import (
 	"context"
@@ -12,7 +12,7 @@ type UsersRepo struct {
 	db ksql.Provider
 }
 
-func newUsersRepo(db ksql.Provider) UsersRepo {
+func New(db ksql.Provider) UsersRepo {
 	return UsersRepo{
 		db: db,
 	}
