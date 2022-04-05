@@ -1,5 +1,5 @@
 
--include env
+-include config.env
 export
 
 api: setup
@@ -8,7 +8,7 @@ api: setup
 lint: setup
 	go vet ./...
 
-setup: env
-env:
-	cp env.example env
+setup: config.env
+config.env:
+	cp config.env.example config.env
 
