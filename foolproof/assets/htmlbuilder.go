@@ -1,4 +1,4 @@
-package html
+package assets
 
 import (
 	"embed"
@@ -16,22 +16,22 @@ import (
 // compilation and save them inside the binary so you
 // deploy it to production without having to find a way of
 // copying the HTML there too.
-//go:embed *
+//go:embed html/*
 var htmlFS embed.FS
 
-var exampleTemplate = mustParseTemplate("example.html")
+var exampleTemplate = mustParseTemplate("html/example.html")
 
 // WriteExamplePage
 func WriteExamplePage(
 	w io.Writer,
-	v1 string,
-	v2 string,
-	v3 int,
+	username string,
+	address string,
+	age int,
 ) error {
 	return exampleTemplate.Execute(w, map[string]interface{}{
-		"var1": v1,
-		"var2": v2,
-		"var3": v3,
+		"var1": username,
+		"var2": address,
+		"var3": age,
 	})
 }
 

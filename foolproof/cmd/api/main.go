@@ -5,7 +5,7 @@ import (
 	"time"
 
 	"github.com/gofiber/fiber/v2"
-	"github.com/vingarcia/ddd-go-template/foolproof/assets/html"
+	"github.com/vingarcia/ddd-go-template/foolproof/assets"
 	"github.com/vingarcia/ddd-go-template/foolproof/cmd/api/middlewares"
 	"github.com/vingarcia/ddd-go-template/foolproof/cmd/api/usersctrl"
 	"github.com/vingarcia/ddd-go-template/foolproof/cmd/api/venuesctrl"
@@ -100,7 +100,7 @@ func main() {
 	// and explicit arguments with a "builder function":
 	app.Get("/example-html", func(c *fiber.Ctx) error {
 		c.Set("Content-Type", "text/html")
-		return html.WriteExamplePage(c, "username", "user address", 42)
+		return assets.WriteExamplePage(c, "username", "user address", 42)
 	})
 
 	logger.Info(ctx, "server-starting-up", domain.LogBody{
