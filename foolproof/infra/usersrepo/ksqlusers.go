@@ -1,11 +1,11 @@
-package ksqlusers
+package usersrepo
 
 import (
 	"context"
 	"fmt"
 	"time"
 
-	"github.com/vingarcia/ddd-go-template/advanced/domain"
+	"github.com/vingarcia/ddd-go-template/foolproof/domain"
 	"github.com/vingarcia/ksql"
 )
 

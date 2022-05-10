@@ -11,4 +11,5 @@ import (
 type Users interface {
 	GetUser(ctx context.Context, userID int) (domain.User, error)
 	UpsertUser(ctx context.Context, user domain.User) (userID int, err error)
+	GetUserByEmail(ctx context.Context, email string) (domain.User, error)
 }

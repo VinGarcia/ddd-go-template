@@ -30,9 +30,10 @@ type LabeledCoords struct {
 }
 
 type User struct {
-	ID   int    `ksql:"id"`
-	Name string `ksql:"name"`
-	Age  int    `ksql:"age"`
+	ID    int    `ksql:"id"`
+	Name  string `ksql:"name"`
+	Email string `ksql:"email"`
+	Age   int    `ksql:"age"`
 
 	CreatedAt *time.Time `ksql:"created_at"`
 	UpdatedAt *time.Time `ksql:"updated_at"`
