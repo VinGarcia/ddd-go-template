@@ -21,7 +21,8 @@ var htmlFS embed.FS
 
 var exampleTemplate = mustParseTemplate("html/example.html")
 
-// WriteExamplePage
+// WriteExamplePage wraps the exampleTemplate in order to
+// provide a type-safe API for building this template.
 func WriteExamplePage(
 	w io.Writer,
 	username string,

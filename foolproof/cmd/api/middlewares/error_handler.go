@@ -5,6 +5,8 @@ import (
 	"github.com/vingarcia/ddd-go-template/foolproof/domain"
 )
 
+// HandleError is responsible for converting domain errors to HTTP errors
+// simplifying error handling overall.
 func HandleError(logger domain.LogProvider) func(c *fiber.Ctx) error {
 	return func(c *fiber.Ctx) error {
 		err := c.Next()

@@ -6,7 +6,7 @@ import (
 	"github.com/vingarcia/ddd-go-template/advanced/domain"
 )
 
-// User represents the operations we use for
+// Users represents the operations we use for
 // retrieving a user from a persistent storage
 type Users interface {
 	GetUser(ctx context.Context, userID int) (domain.User, error)

@@ -6,7 +6,7 @@ import (
 	"github.com/google/uuid"
 )
 
-// This needs to be a string, since its used on Fiber `.Locals()`
+// RequestIDKey needs to be a string, since its used on Fiber `.Locals()`
 const RequestIDKey string = "request_id_key"
 
 func GenerateRequestID() string {

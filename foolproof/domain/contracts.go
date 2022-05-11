@@ -21,6 +21,7 @@ type CacheProvider interface {
 	Set(ctx context.Context, key string, record interface{}) error
 }
 
+// LogProvider describes what is expected from a log provider
 type LogProvider interface {
 	Debug(ctx context.Context, title string, valueMaps ...LogBody)
 	Info(ctx context.Context, title string, valueMaps ...LogBody)
@@ -29,12 +30,12 @@ type LogProvider interface {
 	Fatal(ctx context.Context, title string, valueMaps ...LogBody)
 }
 
-// Body is the log body containing the keys and values
+// LogBody is the log body containing the keys and values
 // used to build the structured logs
 type LogBody = map[string]interface{}
 
-// Provider provides the functions to perform
-// REST requests automatically marshalling the input body as JSON.
+// RestProvider describes what is expected from an HTTP provider
+// with facilitated support for REST and JSON.
 //
 // It returns error only if it was not possible to complete the request
 // either because of a marshal error or a network error.

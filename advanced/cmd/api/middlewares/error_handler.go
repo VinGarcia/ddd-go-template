@@ -6,6 +6,8 @@ import (
 	"github.com/vingarcia/ddd-go-template/advanced/infra/log"
 )
 
+// HandleError is responsible for converting domain errors to HTTP errors
+// simplifying error handling overall.
 func HandleError(logger log.Provider) func(c *fiber.Ctx) error {
 	return func(c *fiber.Ctx) error {
 		err := c.Next()
