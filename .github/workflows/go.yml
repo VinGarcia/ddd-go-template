@@ -18,8 +18,14 @@ jobs:
       with:
         go-version: 1.16
 
-    - name: Lint
-      run: go vet ./...
+    - name: Lint v1-very-simple
+      run: (cd v1-very-simple; go vet ./...)
 
-    - name: Test
-      run: go test -v ./...
+    - name: Lint v1-simple-with-short-interface-names
+      run: (cd v1-simple-with-short-interface-names; go vet ./...)
+
+    - name: Test v1-very-simple
+      run: (cd v1-very-simple; go test ./...)
+
+    - name: Test v1-simple-with-short-interface-names
+      run: (cd v1-simple-with-short-interface-names; go test ./...)
