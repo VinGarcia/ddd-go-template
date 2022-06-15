@@ -1,4 +1,4 @@
-# DDD Go Template - Advanced version
+# DDD Go Template - Simple with Short Interface Names version
 
 If you haven't read yet, I recommend reading the `foolproof/README.md` first.
 
