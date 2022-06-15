@@ -16,11 +16,8 @@ import (
 	"github.com/vingarcia/ddd-go-template/foolproof/infra/http"
 	"github.com/vingarcia/ddd-go-template/foolproof/infra/jsonlogs"
 	"github.com/vingarcia/ddd-go-template/foolproof/infra/memorycache"
+	"github.com/vingarcia/ddd-go-template/foolproof/infra/pgrepo"
 	"github.com/vingarcia/ddd-go-template/foolproof/infra/redis"
-	"github.com/vingarcia/ddd-go-template/foolproof/infra/usersrepo"
-	"github.com/vingarcia/ksql"
-
-	_ "github.com/lib/pq"
 )
 
 func main() {
@@ -61,15 +58,13 @@ func main() {
 	// only working on top of the domain language, i.e. types and interfaces from the domain/ package
 	venuesController := venuesctrl.NewController(venuesService)
 
-	db, err := ksql.New("postgres", dbURL, ksql.Config{})
+	usersRepo, err := pgrepo.NewClient(ctx, dbURL)
 	if err != nil {
 		logger.Fatal(ctx, "unable to start database", domain.LogBody{
 			"db_url": dbURL,
 			"error":  err.Error(),
 		})
 	}
-
-	usersRepo := usersrepo.NewClient(db)
 
 	usersService := users.NewService(logger, usersRepo)
 

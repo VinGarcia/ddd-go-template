@@ -1,10 +1,12 @@
-package ksqlusers
+package pgrepo
 
 import (
 	"context"
 
 	"github.com/vingarcia/ddd-go-template/advanced/domain"
+	"github.com/vingarcia/ddd-go-template/advanced/infra/log"
 	"github.com/vingarcia/ksql"
+	"github.com/vingarcia/ksql/adapters/kpgx"
 )
 
 // UsersRepo implements the repo.Users interface by using the ksql database.
@@ -13,10 +15,17 @@ type UsersRepo struct {
 }
 
 // New instantiates a new UsersRepo
-func New(db ksql.Provider) UsersRepo {
+func New(ctx context.Context, postgresURL string) (UsersRepo, error) {
+	db, err := kpgx.New(ctx, postgresURL, ksql.Config{})
+	if err != nil {
+		return UsersRepo{}, domain.InternalErr("unable to start database", log.Body{
+			"error": err.Error(),
+		})
+	}
+
 	return UsersRepo{
 		db: db,
-	}
+	}, nil
 }
 
 // ChangeUserEmail implements the repo.Users interface

@@ -25,9 +25,7 @@ import (
 	"github.com/vingarcia/ddd-go-template/advanced/infra/rest/http"
 
 	"github.com/vingarcia/ddd-go-template/advanced/infra/repo"
-	"github.com/vingarcia/ddd-go-template/advanced/infra/repo/ksqlusers"
-
-	"github.com/vingarcia/ksql"
+	"github.com/vingarcia/ddd-go-template/advanced/infra/repo/pgrepo"
 
 	_ "github.com/lib/pq"
 )
@@ -70,15 +68,14 @@ func main() {
 	// only working on top of the domain language, i.e. types and interfaces from the domain/ package
 	venuesController := venuesctrl.NewController(venuesService)
 
-	db, err := ksql.New("postgres", dbURL, ksql.Config{})
+	var usersRepo repo.Users
+	usersRepo, err := pgrepo.New(ctx, dbURL)
 	if err != nil {
 		logger.Fatal(ctx, "unable to start database", log.Body{
 			"db_url": dbURL,
 			"error":  err.Error(),
 		})
 	}
-
-	var usersRepo repo.Users = ksqlusers.New(db)
 
 	usersService := users.NewService(logger, usersRepo)
 

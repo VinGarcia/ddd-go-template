@@ -1,10 +1,11 @@
-package usersrepo
+package pgrepo
 
 import (
 	"context"
 
 	"github.com/vingarcia/ddd-go-template/foolproof/domain"
 	"github.com/vingarcia/ksql"
+	"github.com/vingarcia/ksql/adapters/kpgx"
 )
 
 // Client implements the repo.Users interface by using the ksql database.
@@ -13,10 +14,18 @@ type Client struct {
 }
 
 // NewClient instantiates a new Client
-func NewClient(db ksql.Provider) Client {
+func NewClient(ctx context.Context, postgresURL string) (Client, error) {
+	db, err := kpgx.New(ctx, postgresURL, ksql.Config{})
+	if err != nil {
+		return Client{}, domain.InternalErr("unable to start database", domain.LogBody{
+			"postgres_url": postgresURL,
+			"error":        err.Error(),
+		})
+	}
+
 	return Client{
 		db: db,
-	}
+	}, nil
 }
 
 // ChangeUserEmail implements the repo.Users interface

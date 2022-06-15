@@ -1,11 +1,11 @@
-package usersrepo
+package pgrepo
 
 import (
 	"context"
 	"fmt"
 	"time"
 
-	"github.com/vingarcia/ddd-go-template/foolproof/domain"
+	"github.com/vingarcia/ddd-go-template/advanced/domain"
 	"github.com/vingarcia/ksql"
 )
 
@@ -51,7 +51,7 @@ func changeUserEmail(ctx context.Context, db ksql.Provider, userID int, newEmail
 func upsertUser(ctx context.Context, db ksql.Provider, user domain.User) (userID int, _ error) {
 	now := time.Now()
 	user.UpdatedAt = &now
-	err := db.Update(ctx, domain.UsersTable, &user)
+	err := db.Patch(ctx, domain.UsersTable, &user)
 	if err == ksql.ErrRecordNotFound {
 		user.CreatedAt = &now
 		err = db.Insert(ctx, domain.UsersTable, &user)
