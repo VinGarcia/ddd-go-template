@@ -1,4 +1,4 @@
-# DDD Go Template - Fool Proof version
+# DDD Go Template - Very Simple version
 
 This project was created to illustrate an interesting directory structure
 I developed together with [@fabiorodrigues](https://github.com/fabiorodrigues) in the period I was working
