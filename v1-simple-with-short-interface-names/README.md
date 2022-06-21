@@ -1,8 +1,8 @@
 # DDD Go Template - Simple with Short Interface Names version
 
-If you haven't read yet, I recommend reading the `foolproof/README.md` first.
+If you haven't read yet, I recommend reading the `v1-very-simple/README.md` first.
 
-This example template has the same logical structure as the `foolproof` version,
+This example template has the same logical structure as the `v1-very-simple` version,
 but organizes the interfaces and DTOs in a way that allows better names, such as:
 
 - `rest.Provider` instead of `domain.RestProvider`
