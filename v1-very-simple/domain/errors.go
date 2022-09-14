@@ -1,23 +1,21 @@
 package domain
 
 import (
-	"context"
-	"encoding/json"
 	"fmt"
 	"strings"
 )
 
 type DomainErr struct {
-	code  string
-	title string
-	data  map[string]interface{}
+	Code  string
+	Title string
+	Data  map[string]interface{}
 }
 
 func (e DomainErr) Error() string {
 	fields := []string{
-		e.code + ": " + e.title,
+		e.Code + ": " + e.Title,
 	}
-	for k, v := range e.data {
+	for k, v := range e.Data {
 		fields = append(fields, fmt.Sprintf("%s = %#v", k, v))
 	}
 
@@ -30,77 +28,39 @@ func AsDomainErr(err error) DomainErr {
 		return domainErr
 	}
 	return DomainErr{
-		code:  "InternalErr",
-		title: err.Error(),
+		Code:  "InternalErr",
+		Title: err.Error(),
 	}
 }
 
 func InternalErr(title string, data map[string]interface{}) DomainErr {
 	return DomainErr{
-		code:  "InternalErr",
-		title: title,
-		data:  data,
+		Code:  "InternalErr",
+		Title: title,
+		Data:  data,
 	}
 }
 
 func BadRequestErr(title string, data map[string]interface{}) DomainErr {
 	return DomainErr{
-		code:  "BadRequestErr",
-		title: title,
-		data:  data,
+		Code:  "BadRequestErr",
+		Title: title,
+		Data:  data,
 	}
 }
 
 func UnauthorizedErr(title string, data map[string]interface{}) DomainErr {
 	return DomainErr{
-		code:  "UnauthorizedErr",
-		title: title,
-		data:  data,
+		Code:  "UnauthorizedErr",
+		Title: title,
+		Data:  data,
 	}
 }
 
 func NotFoundErr(title string, data map[string]interface{}) DomainErr {
 	return DomainErr{
-		code:  "NotFoundErr",
-		title: title,
-		data:  data,
+		Code:  "NotFoundErr",
+		Title: title,
+		Data:  data,
 	}
-}
-
-func HandleDomainErrAsHTTP(ctx context.Context, logger LogProvider, err error, method string, path string) (status int, responseBody []byte) {
-	domainErr := AsDomainErr(err)
-
-	response := map[string]interface{}{
-		"code":       domainErr.code,
-		"title":      domainErr.title,
-		"request_id": GetRequestIDFromContext(ctx),
-	}
-
-	switch domainErr.code {
-	case "InternalErr":
-		status = 500
-
-		data := LogBody{
-			"route": method + ": " + path,
-		}
-		for k, v := range domainErr.data {
-			data[k] = v
-		}
-		logger.Error(ctx, "request-error", data)
-
-	case "BadRequest":
-		status = 400
-		for k, v := range domainErr.data {
-			response[k] = v
-		}
-
-	case "NotFoundErr":
-		status = 404
-		for k, v := range domainErr.data {
-			response[k] = v
-		}
-	}
-
-	responseBody, _ = json.Marshal(response)
-	return status, responseBody
 }

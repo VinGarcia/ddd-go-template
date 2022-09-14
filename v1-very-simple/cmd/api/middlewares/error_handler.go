@@ -1,6 +1,9 @@
 package middlewares
 
 import (
+	"context"
+	"encoding/json"
+
 	"github.com/gofiber/fiber/v2"
 	"github.com/vingarcia/ddd-go-template/v1-very-simple/domain"
 )
@@ -15,7 +18,7 @@ func HandleError(logger domain.LogProvider) func(c *fiber.Ctx) error {
 		}
 
 		req := c.Request()
-		status, body := domain.HandleDomainErrAsHTTP(
+		status, body := handleDomainErrAsHTTP(
 			c.Context(),
 			logger,
 			err,
@@ -25,4 +28,42 @@ func HandleError(logger domain.LogProvider) func(c *fiber.Ctx) error {
 		c.Status(status).Send(body)
 		return nil
 	}
+}
+
+func handleDomainErrAsHTTP(ctx context.Context, logger domain.LogProvider, err error, method string, path string) (status int, responseBody []byte) {
+	domainErr := domain.AsDomainErr(err)
+
+	response := map[string]interface{}{
+		"code":       domainErr.Code,
+		"title":      domainErr.Title,
+		"request_id": domain.GetRequestIDFromContext(ctx),
+	}
+
+	switch domainErr.Code {
+	case "InternalErr":
+		status = 500
+
+		data := domain.LogBody{
+			"route": method + ": " + path,
+		}
+		for k, v := range domainErr.Data {
+			data[k] = v
+		}
+		logger.Error(ctx, "request-error", data)
+
+	case "BadRequest":
+		status = 400
+		for k, v := range domainErr.Data {
+			response[k] = v
+		}
+
+	case "NotFoundErr":
+		status = 404
+		for k, v := range domainErr.Data {
+			response[k] = v
+		}
+	}
+
+	responseBody, _ = json.Marshal(response)
+	return status, responseBody
 }
