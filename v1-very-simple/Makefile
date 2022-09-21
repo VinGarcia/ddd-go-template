@@ -17,12 +17,13 @@ lint: setup
 	go vet ./...
 
 setup: config.env $(GOBIN)/richgo $(GOBIN)/staticcheck
+
 config.env:
 	cp config.env.example config.env
 
 $(GOBIN)/richgo:
-	go get github.com/kyoh86/richgo
+	go install github.com/kyoh86/richgo@latest
 
 $(GOBIN)/staticcheck:
-	GO111MODULE=off go get -u honnef.co/go/tools/cmd/staticcheck
+	go install honnef.co/go/tools/cmd/staticcheck@latest
 

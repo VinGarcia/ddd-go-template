@@ -9,6 +9,7 @@ import (
 	"time"
 
 	"github.com/vingarcia/ddd-go-template/v1-very-simple/domain"
+	tt "github.com/vingarcia/ddd-go-template/v1-very-simple/infra/testtools"
 
 	"github.com/stretchr/testify/assert"
 )
@@ -138,14 +139,16 @@ func TestBuildJSONString(t *testing.T) {
 }
 
 func TestLogFuncs(t *testing.T) {
+	ctx := context.Background()
+
 	t.Run("debug logs should produce logs correctly", func(t *testing.T) {
 		var output string
-		ctx := context.TODO()
 		client := Client{
 			priorityLevel: 0,
 			PrintlnFn: func(args ...interface{}) {
 				output = fmt.Sprintln(args...)
 			},
+			ctxParsers: []ContextParser{domain.GetCtxValues},
 		}
 
 		ctx = domain.CtxWithValues(ctx, domain.LogBody{
@@ -169,26 +172,29 @@ func TestLogFuncs(t *testing.T) {
 			},
 		)
 
+		var outputMap map[string]interface{}
+		err := json.Unmarshal([]byte(output), &outputMap)
+		tt.AssertNoErr(t, err)
+
 		// Default log values:
-		assert.True(t, strings.Contains(output, `"level":"DEBUG"`))
-		assert.True(t, strings.Contains(output, `"title":"fake-log-title"`))
-		assert.True(t, strings.Contains(output, `"timestamp"`))
+		tt.AssertEqual(t, outputMap["level"], "DEBUG")
+		tt.AssertEqual(t, outputMap["title"], "fake-log-title")
+		tt.AssertNotEqual(t, outputMap["timestamp"], nil)
 
 		// Final contextual values:
-		assert.True(t, strings.Contains(output, `"ctx_value1":"overwrites"`))
-		assert.True(t, strings.Contains(output, `"ctx_value2":"overwrites"`))
-		assert.True(t, strings.Contains(output, `"body1_value1":"overwrites"`))
-		assert.True(t, strings.Contains(output, `"ctx_value3":"not-overwritten"`))
-		assert.True(t, strings.Contains(output, `"body1_value2":"not-overwritten"`))
-		assert.True(t, strings.Contains(output, `"body2_value1":"not-overwritten"`))
+		tt.AssertEqual(t, outputMap["ctx_value1"], "overwrites")
+		tt.AssertEqual(t, outputMap["ctx_value2"], "overwrites")
+		tt.AssertEqual(t, outputMap["body1_value1"], "overwrites")
+		tt.AssertEqual(t, outputMap["ctx_value3"], "not-overwritten")
+		tt.AssertEqual(t, outputMap["body1_value2"], "not-overwritten")
+		tt.AssertEqual(t, outputMap["body2_value1"], "not-overwritten")
 
 		// No overwritten field should be present:
-		assert.True(t, !strings.Contains(output, `"overwritten"`))
+		tt.AssertFalse(t, strings.Contains(output, `"overwritten"`))
 	})
 
 	t.Run("debug logs should be ignored if priorityLevel > 0", func(t *testing.T) {
 		var output string
-		ctx := context.TODO()
 		client := Client{
 			priorityLevel: 1,
 			PrintlnFn: func(args ...interface{}) {
@@ -198,17 +204,17 @@ func TestLogFuncs(t *testing.T) {
 
 		client.Debug(ctx, "fake-log-title")
 
-		assert.Equal(t, "", output)
+		tt.AssertEqual(t, "", output)
 	})
 
 	t.Run("info logs should produce logs correctly", func(t *testing.T) {
 		var output string
-		ctx := context.TODO()
 		client := Client{
 			priorityLevel: 0,
 			PrintlnFn: func(args ...interface{}) {
 				output = fmt.Sprintln(args...)
 			},
+			ctxParsers: []ContextParser{domain.GetCtxValues},
 		}
 
 		ctx = domain.CtxWithValues(ctx, domain.LogBody{
@@ -232,26 +238,27 @@ func TestLogFuncs(t *testing.T) {
 			},
 		)
 
-		// Default log values:
-		assert.True(t, strings.Contains(output, `"level":"INFO"`))
-		assert.True(t, strings.Contains(output, `"title":"fake-log-title"`))
-		assert.True(t, strings.Contains(output, `"timestamp"`))
+		tt.AssertContains(t, output,
+			// Default log values:
+			`"level":"INFO"`,
+			`"title":"fake-log-title"`,
+			`"timestamp"`,
 
-		// Final contextual values:
-		assert.True(t, strings.Contains(output, `"ctx_value1":"overwrites"`))
-		assert.True(t, strings.Contains(output, `"ctx_value2":"overwrites"`))
-		assert.True(t, strings.Contains(output, `"body1_value1":"overwrites"`))
-		assert.True(t, strings.Contains(output, `"ctx_value3":"not-overwritten"`))
-		assert.True(t, strings.Contains(output, `"body1_value2":"not-overwritten"`))
-		assert.True(t, strings.Contains(output, `"body2_value1":"not-overwritten"`))
+			// Final contextual values:
+			`"ctx_value1":"overwrites"`,
+			`"ctx_value2":"overwrites"`,
+			`"body1_value1":"overwrites"`,
+			`"ctx_value3":"not-overwritten"`,
+			`"body1_value2":"not-overwritten"`,
+			`"body2_value1":"not-overwritten"`,
+		)
 
 		// No overwritten field should be present:
-		assert.True(t, !strings.Contains(output, `"overwritten"`))
+		tt.AssertFalse(t, strings.Contains(output, `"overwritten"`))
 	})
 
 	t.Run("info logs should be ignored if priorityLevel > 1", func(t *testing.T) {
 		var output string
-		ctx := context.TODO()
 		client := Client{
 			priorityLevel: 2,
 			PrintlnFn: func(args ...interface{}) {
@@ -261,17 +268,17 @@ func TestLogFuncs(t *testing.T) {
 
 		client.Info(ctx, "fake-log-title")
 
-		assert.Equal(t, "", output)
+		tt.AssertEqual(t, output, "")
 	})
 
 	t.Run("warn logs should produce logs correctly", func(t *testing.T) {
 		var output string
-		ctx := context.TODO()
 		client := Client{
 			priorityLevel: 0,
 			PrintlnFn: func(args ...interface{}) {
 				output = fmt.Sprintln(args...)
 			},
+			ctxParsers: []ContextParser{domain.GetCtxValues},
 		}
 
 		ctx = domain.CtxWithValues(ctx, domain.LogBody{
@@ -295,26 +302,27 @@ func TestLogFuncs(t *testing.T) {
 			},
 		)
 
-		// Default log values:
-		assert.True(t, strings.Contains(output, `"level":"WARN"`))
-		assert.True(t, strings.Contains(output, `"title":"fake-log-title"`))
-		assert.True(t, strings.Contains(output, `"timestamp"`))
+		tt.AssertContains(t, output,
+			// Default log values:
+			`"level":"WARN"`,
+			`"title":"fake-log-title"`,
+			`"timestamp"`,
 
-		// Final contextual values:
-		assert.True(t, strings.Contains(output, `"ctx_value1":"overwrites"`))
-		assert.True(t, strings.Contains(output, `"ctx_value2":"overwrites"`))
-		assert.True(t, strings.Contains(output, `"body1_value1":"overwrites"`))
-		assert.True(t, strings.Contains(output, `"ctx_value3":"not-overwritten"`))
-		assert.True(t, strings.Contains(output, `"body1_value2":"not-overwritten"`))
-		assert.True(t, strings.Contains(output, `"body2_value1":"not-overwritten"`))
+			// Final contextual values:
+			`"ctx_value1":"overwrites"`,
+			`"ctx_value2":"overwrites"`,
+			`"body1_value1":"overwrites"`,
+			`"ctx_value3":"not-overwritten"`,
+			`"body1_value2":"not-overwritten"`,
+			`"body2_value1":"not-overwritten"`,
+		)
 
 		// No overwritten field should be present:
-		assert.True(t, !strings.Contains(output, `"overwritten"`))
+		tt.AssertFalse(t, strings.Contains(output, `"overwritten"`))
 	})
 
 	t.Run("warn logs should be ignored if priorityLevel > 2", func(t *testing.T) {
 		var output string
-		ctx := context.TODO()
 		client := Client{
 			priorityLevel: 3,
 			PrintlnFn: func(args ...interface{}) {
@@ -324,17 +332,17 @@ func TestLogFuncs(t *testing.T) {
 
 		client.Warn(ctx, "fake-log-title")
 
-		assert.Equal(t, "", output)
+		tt.AssertEqual(t, output, "")
 	})
 
 	t.Run("error logs should produce logs correctly", func(t *testing.T) {
 		var output string
-		ctx := context.TODO()
 		client := Client{
 			priorityLevel: 0,
 			PrintlnFn: func(args ...interface{}) {
 				output = fmt.Sprintln(args...)
 			},
+			ctxParsers: []ContextParser{domain.GetCtxValues},
 		}
 
 		ctx = domain.CtxWithValues(ctx, domain.LogBody{
@@ -358,26 +366,27 @@ func TestLogFuncs(t *testing.T) {
 			},
 		)
 
-		// Default log values:
-		assert.True(t, strings.Contains(output, `"level":"ERROR"`))
-		assert.True(t, strings.Contains(output, `"title":"fake-log-title"`))
-		assert.True(t, strings.Contains(output, `"timestamp"`))
+		tt.AssertContains(t, output,
+			// Default log values:
+			`"level":"ERROR"`,
+			`"title":"fake-log-title"`,
+			`"timestamp"`,
 
-		// Final contextual values:
-		assert.True(t, strings.Contains(output, `"ctx_value1":"overwrites"`))
-		assert.True(t, strings.Contains(output, `"ctx_value2":"overwrites"`))
-		assert.True(t, strings.Contains(output, `"body1_value1":"overwrites"`))
-		assert.True(t, strings.Contains(output, `"ctx_value3":"not-overwritten"`))
-		assert.True(t, strings.Contains(output, `"body1_value2":"not-overwritten"`))
-		assert.True(t, strings.Contains(output, `"body2_value1":"not-overwritten"`))
+			// Final contextual values:
+			`"ctx_value1":"overwrites"`,
+			`"ctx_value2":"overwrites"`,
+			`"body1_value1":"overwrites"`,
+			`"ctx_value3":"not-overwritten"`,
+			`"body1_value2":"not-overwritten"`,
+			`"body2_value1":"not-overwritten"`,
+		)
 
 		// No overwritten field should be present:
-		assert.True(t, !strings.Contains(output, `"overwritten"`))
+		tt.AssertFalse(t, strings.Contains(output, `"overwritten"`))
 	})
 
 	t.Run("error logs should be ignored if priorityLevel > 3", func(t *testing.T) {
 		var output string
-		ctx := context.TODO()
 		client := Client{
 			priorityLevel: 4,
 			PrintlnFn: func(args ...interface{}) {
@@ -387,7 +396,7 @@ func TestLogFuncs(t *testing.T) {
 
 		client.Error(ctx, "fake-log-title")
 
-		assert.Equal(t, "", output)
+		tt.AssertEqual(t, output, "")
 	})
 }
 

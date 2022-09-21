@@ -16,20 +16,18 @@ import (
 
 // Declaring a unique private type for the ctx key
 // guarantees that no key colision will ever happen:
-type logCtxKeyType uint8
-
-var logCtxKey logCtxKeyType
+type logCtxKey struct{}
 
 // CtxWithValues merges received values with log body currently stored
 // on the input ctx.
 func CtxWithValues(ctx context.Context, values LogBody) context.Context {
-	m, _ := ctx.Value(logCtxKey).(LogBody)
-	return context.WithValue(ctx, logCtxKey, mergeMaps(m, values))
+	m, _ := ctx.Value(logCtxKey{}).(LogBody)
+	return context.WithValue(ctx, logCtxKey{}, mergeMaps(m, values))
 }
 
 // GetCtxValues extracts the log body currently stored on the input ctx.
 func GetCtxValues(ctx context.Context) LogBody {
-	m, _ := ctx.Value(logCtxKey).(LogBody)
+	m, _ := ctx.Value(logCtxKey{}).(LogBody)
 	if m == nil {
 		m = LogBody{}
 	}

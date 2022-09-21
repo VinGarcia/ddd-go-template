@@ -9,6 +9,16 @@ import (
 	"github.com/stretchr/testify/require"
 )
 
+// AssertTrue will check if the input argument is true
+func AssertTrue(t *testing.T, b bool, msg ...interface{}) {
+	require.True(t, b, msg...)
+}
+
+// AssertFalse will check if the input argument is false
+func AssertFalse(t *testing.T, b bool, msg ...interface{}) {
+	require.False(t, b, msg...)
+}
+
 // AssertEqual will compare the got argument with the expected argument
 // and fail the test with an appropriate error message if they don't match.
 func AssertEqual(t *testing.T, got interface{}, expected interface{}, msg ...interface{}) {
@@ -36,13 +46,17 @@ func AssertNoErr(t *testing.T, err error) {
 func AssertErrContains(t *testing.T, err error, substrs ...string) {
 	require.NotEqual(t, nil, err, "expected an error but the error is nil")
 
-	msg := err.Error()
+	AssertContains(t, err.Error(), substrs...)
+}
 
+// AssertContains will check if an input string contains all
+// the input substrings
+func AssertContains(t *testing.T, str string, substrs ...string) {
 	for _, substr := range substrs {
 		require.True(t,
-			strings.Contains(msg, substr),
+			strings.Contains(str, substr),
 			"missing substring '%s' in error message: '%s'",
-			substr, msg,
+			substr, str,
 		)
 	}
 }
