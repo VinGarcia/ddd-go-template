@@ -2,8 +2,12 @@
 
 If you haven't read yet, I recommend reading the `v1-very-simple/README.md` first.
 
-This template as the other two is based on the same ideas, so it is useful to
-learn the simplest version first.
+This template as the other one is based on the same concepts, except this one
+is taking advantage of how similar this architecture is to the Ports & Adapters architecture
+and making use of some good descriptive names from that context.
+
+That said it is useful to start learning from the simplest version first before reading
+this one.
 
 This example template has the same logical structure as the `v1-very-simple` version,
 but organizes the interfaces and DTOs in a way that allows better names, such as:
@@ -47,7 +51,8 @@ only the relevant interfaces for that dependency, so now we have 3 new files wit
 
 And the old `domain/contracts.go` was deleted.
 
-We also moved the two helpers that we used to have to the helpers directory:
+We also moved the two helpers that we used to have inside the infra package
+to the helpers directory:
 
 - The `infra/env` pkg was moved to `helpers/env`
 - The `infra/maps` pkg was moved to `helpers/maps`
