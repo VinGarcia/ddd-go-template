@@ -21,11 +21,11 @@ jobs:
     - name: Lint v1-very-simple
       run: (cd v1-very-simple; go vet ./...)
 
-    - name: Lint v1-simple-with-short-interface-names
-      run: (cd v1-simple-with-short-interface-names; go vet ./...)
+    - name: Lint v2-domain-adapters-and-helpers
+      run: (cd v2-domain-adapters-and-helpers; go vet ./...)
 
     - name: Test v1-very-simple
       run: (cd v1-very-simple; go test ./...)
 
-    - name: Test v1-simple-with-short-interface-names
-      run: (cd v1-simple-with-short-interface-names; go test ./...)
+    - name: Test v2-domain-adapters-and-helpers
+      run: (cd v2-domain-adapters-and-helpers; go test ./...)
