@@ -1,3 +1,0 @@
-# The env file contains sensitive data,
-# so it must be ignored so we don't push passwords to the repo
-/config.env
