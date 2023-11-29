@@ -64,7 +64,7 @@ func (c Controller) GetUser(ctx *fiber.Ctx) error {
 	userID, err := ctx.ParamsInt("id")
 	if err != nil {
 		return domain.BadRequestErr("the input user id is not a valid integer", map[string]interface{}{
-			"received_id": ctx.Params(":id"),
+			"received_id": ctx.Params("id"),
 		})
 	}
 
