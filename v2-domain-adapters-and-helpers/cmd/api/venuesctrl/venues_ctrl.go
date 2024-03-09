@@ -4,7 +4,7 @@ import (
 	"encoding/json"
 	"fmt"
 
-	"github.com/gofiber/fiber/v2"
+	"github.com/gofiber/fiber/v3"
 	"github.com/vingarcia/ddd-go-template/v2-domain-adapters-and-helpers/domain/venues"
 )
 
@@ -27,7 +27,7 @@ func NewController(venuesService venues.Service) Controller {
 	}
 }
 
-func (c Controller) GetVenuesByCoordinates(ctx *fiber.Ctx) error {
+func (c Controller) GetVenuesByCoordinates(ctx fiber.Ctx) error {
 	latitude := ctx.Params("latitude")
 	longitude := ctx.Params("latitude")
 
@@ -44,7 +44,7 @@ func (c Controller) GetVenuesByCoordinates(ctx *fiber.Ctx) error {
 	return ctx.Send(rawJSON)
 }
 
-func (c Controller) GetDetails(ctx *fiber.Ctx) error {
+func (c Controller) GetDetails(ctx fiber.Ctx) error {
 	id := ctx.Params("id")
 	venue, err := c.venuesService.GetVenue(ctx.Context(), id)
 	if err != nil {

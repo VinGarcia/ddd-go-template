@@ -3,14 +3,14 @@ package middlewares
 import (
 	"time"
 
-	"github.com/gofiber/fiber/v2"
+	"github.com/gofiber/fiber/v3"
 	"github.com/vingarcia/ddd-go-template/v2-domain-adapters-and-helpers/adapters/log"
 )
 
 // RequestLogger will log every request including the request payload,
 // status code, duration and information about any errors.
-func RequestLogger(logger log.Provider) func(c *fiber.Ctx) error {
-	return func(c *fiber.Ctx) error {
+func RequestLogger(logger log.Provider) func(c fiber.Ctx) error {
+	return func(c fiber.Ctx) error {
 		startTime := time.Now()
 
 		err := c.Next()

@@ -4,7 +4,8 @@ import (
 	"context"
 	"time"
 
-	"github.com/gofiber/fiber/v2"
+	"github.com/gofiber/fiber/v3"
+	"golang.org/x/sync/errgroup"
 
 	"github.com/vingarcia/ddd-go-template/v2-domain-adapters-and-helpers/assets"
 
@@ -46,6 +47,34 @@ func main() {
 	// Dependency Injection goes here:
 	logger := jsonlogs.New(logLevel, domain.GetCtxValues)
 
+	err := startAPI(ctx,
+		logger,
+		foursquareBaseURL,
+		foursquareClientID,
+		foursquareSecret,
+		redisURL,
+		redisPassword,
+		dbURL,
+		port,
+	)
+	if err != nil {
+		logger.Error(ctx, "server-stopped-with-an-error", log.Body{
+			"error": err.Error(),
+		})
+	}
+}
+
+func startAPI(
+	ctx context.Context,
+	logger log.Provider,
+	foursquareBaseURL string,
+	foursquareClientID string,
+	foursquareSecret string,
+	redisURL string,
+	redisPassword string,
+	dbURL string,
+	port string,
+) error {
 	restClient := http.New(30 * time.Second)
 
 	var cacheClient cache.Provider
@@ -64,12 +93,8 @@ func main() {
 		foursquareSecret,
 	)
 
-	// The controllers handle HTTP stuff so the services can be kept as simple as possible
-	// only working on top of the domain language, i.e. types and interfaces from the domain/ package
-	venuesController := venuesctrl.NewController(venuesService)
-
-	var usersRepo repo.Users
-	usersRepo, err := pgrepo.New(ctx, dbURL)
+	var repo repo.Provider
+	repo, err := pgrepo.New(ctx, dbURL)
 	if err != nil {
 		logger.Fatal(ctx, "unable to start database", log.Body{
 			"db_url": dbURL,
@@ -77,7 +102,11 @@ func main() {
 		})
 	}
 
-	usersService := users.NewService(logger, usersRepo)
+	usersService := users.NewService(logger, repo)
+
+	// The controllers handle HTTP stuff so the services can be kept as simple as possible
+	// only working on top of the domain language, i.e. types and interfaces from the domain/ package
+	venuesController := venuesctrl.NewController(venuesService)
 
 	usersController := usersctrl.NewController(usersService)
 
@@ -92,8 +121,11 @@ func main() {
 	app.Use(middlewares.HandleError(logger))
 	app.Use(middlewares.RequestLogger(logger))
 
-	app.Get("/ping", func(c *fiber.Ctx) error {
-		return c.SendString("pong")
+	app.Get("/", func(c fiber.Ctx) error {
+		return c.JSON(map[string]any{
+			"service": "venues-service",
+			"state":   "healthy",
+		})
 	})
 
 	app.Post("/users", usersController.UpsertUser)
@@ -104,7 +136,7 @@ func main() {
 
 	// Just an example on how to serve html templates using the embed library
 	// and explicit arguments with a "builder function":
-	app.Get("/example-html", func(c *fiber.Ctx) error {
+	app.Get("/example-html", func(c fiber.Ctx) error {
 		c.Set("Content-Type", "text/html")
 		return assets.WriteExamplePage(c, "username", "user address", 42)
 	})
@@ -112,9 +144,15 @@ func main() {
 	logger.Info(ctx, "server-starting-up", log.Body{
 		"port": port,
 	})
-	if err := app.Listen(":" + port); err != nil {
-		logger.Error(ctx, "server-stopped-with-an-error", log.Body{
-			"error": err.Error(),
-		})
-	}
+
+	g, ctx := errgroup.WithContext(ctx)
+	g.Go(func() error {
+		return app.Listen(":" + port)
+	})
+	g.Go(func() error {
+		<-ctx.Done()
+		return app.Shutdown()
+	})
+
+	return g.Wait()
 }

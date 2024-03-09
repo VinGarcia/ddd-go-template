@@ -3,7 +3,7 @@ package usersctrl
 import (
 	"encoding/json"
 
-	"github.com/gofiber/fiber/v2"
+	"github.com/gofiber/fiber/v3"
 	"github.com/vingarcia/ddd-go-template/v2-domain-adapters-and-helpers/domain"
 	"github.com/vingarcia/ddd-go-template/v2-domain-adapters-and-helpers/domain/users"
 )
@@ -27,7 +27,7 @@ func NewController(usersService users.Service) Controller {
 	}
 }
 
-func (c Controller) UpsertUser(ctx *fiber.Ctx) error {
+func (c Controller) UpsertUser(ctx fiber.Ctx) error {
 	// Intermediary structure so I don't expose my internal
 	// user representation to the outside world:
 	var user struct {
@@ -60,7 +60,7 @@ func (c Controller) UpsertUser(ctx *fiber.Ctx) error {
 	})
 }
 
-func (c Controller) GetUser(ctx *fiber.Ctx) error {
+func (c Controller) GetUser(ctx fiber.Ctx) error {
 	userID, err := ctx.ParamsInt("id")
 	if err != nil {
 		return domain.BadRequestErr("the input user id is not a valid integer", map[string]interface{}{
