@@ -3,6 +3,7 @@ package middlewares
 import (
 	"context"
 	"encoding/json"
+	"errors"
 
 	"github.com/gofiber/fiber/v3"
 	"github.com/vingarcia/ddd-go-template/v2-domain-adapters-and-helpers/adapters/log"
@@ -15,6 +16,16 @@ func HandleError(logger log.Provider) func(c fiber.Ctx) error {
 	return func(c fiber.Ctx) error {
 		err := c.Next()
 		if err == nil {
+			return nil
+		}
+
+		var e *fiber.Error
+		if errors.As(err, &e) {
+			c.Status(e.Code).JSON(map[string]interface{}{
+				"code":       "HttpRequestError",
+				"title":      e.Message,
+				"request_id": domain.GetRequestIDFromContext(c.Context()),
+			})
 			return nil
 		}
 

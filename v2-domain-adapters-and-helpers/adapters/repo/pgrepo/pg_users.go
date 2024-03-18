@@ -49,13 +49,23 @@ func changeUserEmail(ctx context.Context, db ksql.Provider, userID int, newEmail
 // Keeping the implementation deatached like this and passing the database provider interface
 // as an argument allows you to include several diferent calls in a same transaction.
 func upsertUser(ctx context.Context, db ksql.Provider, user domain.User) (userID int, _ error) {
-	now := time.Now()
-	user.UpdatedAt = &now
-	err := db.Patch(ctx, domain.UsersTable, &user)
-	if err == ksql.ErrRecordNotFound {
-		user.CreatedAt = &now
-		err = db.Insert(ctx, domain.UsersTable, &user)
+	var row struct {
+		ID int `ksql:"id"`
 	}
+	err := db.QueryOne(ctx, &row,
+		`INSERT INTO users (
+			name, email, age, updated_at, created_at
+		) VALUES (
+			$1, $2, $3, $4, $4
+		) ON CONFLICT (id) DO
+		UPDATE SET
+			name = $1,
+			email = $2,
+			age = $3,
+			updated_at = $4
+		RETURNING id`,
+		user.Name, user.Email, user.Age, time.Now(),
+	)
 	if err != nil {
 		return 0, domain.InternalErr("unexpected error when saving user", map[string]interface{}{
 			"user":  user,
@@ -63,7 +73,7 @@ func upsertUser(ctx context.Context, db ksql.Provider, user domain.User) (userID
 		})
 	}
 
-	return user.ID, nil
+	return row.ID, nil
 }
 
 func getUser(ctx context.Context, db ksql.Provider, userID int) (domain.User, error) {

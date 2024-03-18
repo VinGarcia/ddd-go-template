@@ -85,13 +85,14 @@ func TestAPI(t *testing.T) {
 		mockHandler: &mockHandler,
 	}
 
-	testHealthCheck(ctx, t, testData)
+	healthCheckTest(ctx, t, testData)
+	usersTest(ctx, t, testData)
 
 	cancel()
 	g.Wait()
 }
 
-func testHealthCheck(ctx context.Context, t *testing.T, data testData) {
+func healthCheckTest(ctx context.Context, t *testing.T, data testData) {
 	resp, err := data.http.Get(ctx, data.serverURL, krest.RequestData{})
 	tt.AssertNoErr(t, err)
 	tt.AssertEqual(t, resp.StatusCode, 200)
@@ -184,7 +185,7 @@ func startPostgresDB(ctx context.Context, dbName string) (databaseURL string, cl
 	}
 }
 
-func ResetTestState(ctx context.Context, data testData) {
+func resetTestState(ctx context.Context, data testData) {
 	*data.mockHandler = http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		w.WriteHeader(400)
 		w.Write([]byte("mockHandler: unexpected request to: " + r.URL.Path))

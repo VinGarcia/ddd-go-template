@@ -35,6 +35,6 @@ type User struct {
 	Email string `ksql:"email"`
 	Age   int    `ksql:"age"`
 
-	CreatedAt *time.Time `ksql:"created_at"`
-	UpdatedAt *time.Time `ksql:"updated_at"`
+	CreatedAt time.Time `ksql:"created_at,timeNowUTC/skipUpdates"`
+	UpdatedAt time.Time `ksql:"updated_at,timeNowUTC"`
 }
